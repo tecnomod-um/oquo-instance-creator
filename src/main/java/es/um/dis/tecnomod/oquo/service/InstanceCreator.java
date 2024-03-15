@@ -12,7 +12,7 @@ import org.apache.jena.vocabulary.RDF;
 import es.um.dis.tecnomod.oquo.dto.ObservationInfoDTO;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
-public class RDFService {
+public class InstanceCreator {
 
 	private static final String HAS_RANKIG_FUNCTION = Namespaces.QM_NS + "hasRankigFunction";
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
