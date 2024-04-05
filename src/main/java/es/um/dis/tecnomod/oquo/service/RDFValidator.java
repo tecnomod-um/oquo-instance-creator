@@ -11,7 +11,6 @@ import org.apache.jena.shacl.ValidationReport;
 public class RDFValidator {
 	private static final String OQUO_ONTOLOGY = "https://purl.archive.org/oquo";
 	private static final String OQUO_SHAPES = "https://raw.githubusercontent.com/tecnomod-um/oquo/main/shacl_eval.ttl";
-	//private static final String OQUO_SHAPES = "/home/fabad/ontologies/oquo/shacl_eval.ttl";
 	
 	/**
 	 * Validate a jena model according to the oquo model

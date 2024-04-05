@@ -41,6 +41,7 @@ class RDFValidatorTest {
 		ValidationReport report = RDFValidator.validate(model);
 		assertFalse(report.conforms());
 		ShLib.printReport(report);
+		
 	}
 
 	
@@ -103,13 +104,6 @@ class RDFValidatorTest {
 				model.createResource(Namespaces.RES_NS + "EvaluationSubject"));
 		model.add(evaluation, evaluatedSubject, evaluationSubject);
 		
-//		
-//		InstanceCreator.createObservation(model, createObservation1());
-//		InstanceCreator.createObservation(model, createObservation2());
-//		InstanceCreator.createObservation(model, createObservation3());
-//		Statement statementToRemove = model.listStatements().toList().get(25);
-//		System.out.println("Removing statement -> " + statementToRemove);
-//		model.remove(statementToRemove);
 		return model;
 	}
 }
