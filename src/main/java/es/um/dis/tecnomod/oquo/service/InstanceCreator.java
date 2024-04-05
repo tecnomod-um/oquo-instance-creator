@@ -16,21 +16,33 @@ public class InstanceCreator {
 
 	private static final String HAS_RANKIG_FUNCTION = Namespaces.QM_NS + "hasRankigFunction";
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
-	private static final String IS_MEASURED_ON_SCALE = Namespaces.EVALUATION_RESULT_NS + "isMeasuredOnScale";
-	private static final String FOR_MEASURE = Namespaces.EVALUATION_RESULT_NS + "forMeasure";
+	private static final String IS_MEASURED_ON_SCALE = Namespaces.RES_NS + "isMeasuredOnScale";
+	private static final String FOR_MEASURE = Namespaces.RES_NS + "forMeasure";
 	private static final String QUALITY_MEASURE = Namespaces.QM_NS + "QualityMeasure";
-	private static final String PRODUCED_QUALITY_VALUE = Namespaces.EVALUATION_RESULT_NS + "producedQualityValue";
-	private static final String OBTAINED_FROM = Namespaces.EVALUATION_RESULT_NS + "obtainedFrom";
-	private static final String HAS_LITERAL_VALUE = Namespaces.EVALUATION_RESULT_NS + "hasLiteralValue";
-	private static final String QUALITY_VALUE = Namespaces.EVALUATION_RESULT_NS + "QualityValue";
-	private static final String INPUT_DATA = Namespaces.EVALUATION_RESULT_NS + "inputData";
-	private static final String EVALUATION_DATA = Namespaces.EVALUATION_RESULT_NS + "EvaluationData";
-	private static final String PERFORMED_ON = Namespaces.EVALUATION_RESULT_NS + "performedOn";
+	private static final String PRODUCED_QUALITY_VALUE = Namespaces.RES_NS + "producedQualityValue";
+	private static final String OBTAINED_FROM = Namespaces.RES_NS + "obtainedFrom";
+	private static final String HAS_LITERAL_VALUE = Namespaces.RES_NS + "hasLiteralValue";
+	private static final String QUALITY_VALUE = Namespaces.RES_NS + "QualityValue";
+	private static final String INPUT_DATA = Namespaces.RES_NS + "inputData";
+	private static final String EVALUATION_DATA = Namespaces.RES_NS + "EvaluationData";
+	private static final String PERFORMED_ON = Namespaces.RES_NS + "performedOn";
 	private static final String IN_XSD_DATE_TIME = Namespaces.TIME_NS + "inXSDDateTime";
 	private static final String INSTANT = Namespaces.TIME_NS + "Instant";
-	private static final String EVALUATED_SUBJECT = Namespaces.EVALUATION_RESULT_NS + "evaluatedSubject";
-	private static final String EVALUATION = Namespaces.EVALUATION_RESULT_NS + "Evaluation";
-	private static final String EVALUATION_SUBJECT = Namespaces.EVALUATION_RESULT_NS + "EvaluationSubject";
+	private static final String EVALUATED_SUBJECT = Namespaces.RES_NS + "evaluatedSubject";
+	private static final String EVALUATION = Namespaces.RES_NS + "Evaluation";
+	private static final String EVALUATION_SUBJECT = Namespaces.RES_NS + "EvaluationSubject";
+	
+	private static final String ENTITY = Namespaces.OBOE_NS + "Entity";
+	private static final String OBSERVATION = Namespaces.OBOE_NS + "Observation";
+	private static final String MEASUREMENT = Namespaces.OBOE_NS + "Measurement";
+	private static final String MEASUREMENT_VALUE = Namespaces.OBOE_NS + "MeasuredValue";
+	
+	private static final String HAS_PART = Namespaces.BTL2_NS + "hasPart";
+	private static final String HAS_MEASUREMENT = Namespaces.OBOE_NS + "hasMeasurement";
+	private static final String HAS_VALUE = Namespaces.OBOE_NS + "hasValue";
+	private static final String MEASUREMENT_FOR = Namespaces.OBOE_NS + "measurementFor";
+	private static final String OF_ENTITY = Namespaces.OBOE_NS + "ofEntity";
+	
 
 	/**
 	 * Include the triples to represent the observation information into the rdf
@@ -51,9 +63,12 @@ public class InstanceCreator {
 		String rankingFunctionIRI = observationInfo.getRankingFunctionIRI();
 		Object value = observationInfo.getValue();
 		Calendar timestamp = observationInfo.getTimestamp();
+		
+		/* Evaluation result triples */
 
 		/* Evaluation and evaluationSubject */
-		String evaluationIRI = Namespaces.OQUO_NS + UUID.randomUUID().toString();
+		//String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + UUID.randomUUID().toString();
+		String evaluationIRI = getEvaluationIRI(observationInfo);
 		Resource evaluationSubject = rdfModel.createResource(featureOfInterestIRI,
 				rdfModel.createResource(EVALUATION_SUBJECT));
 		Resource evaluation = rdfModel.createResource(evaluationIRI, rdfModel.createResource(EVALUATION));
@@ -62,15 +77,20 @@ public class InstanceCreator {
 		Resource featureOfInterestType = rdfModel.createResource(featureOfInterestTypeIRI);
 		rdfModel.add(evaluationSubject, RDF.type, featureOfInterestType);
 
+		
+		
 		/* Instant */
-		String instantIRI = Namespaces.OQUO_NS + UUID.randomUUID().toString();
+		String instantIRI = Namespaces.OQUO_NS + "instant-" + UUID.randomUUID().toString();
 		Resource instant = rdfModel.createResource(instantIRI, rdfModel.createResource(INSTANT));
-		Property inTime = rdfModel.createProperty(IN_XSD_DATE_TIME);
-		rdfModel.add(instant, inTime, rdfModel.createTypedLiteral(timestamp));
-
+		Property inXSDDateTime = rdfModel.createProperty(IN_XSD_DATE_TIME);
+		rdfModel.add(instant, inXSDDateTime, rdfModel.createTypedLiteral(timestamp));
+		
 		/* Evaluation and instant */
 		Property performedOn = rdfModel.createProperty(PERFORMED_ON);
-		rdfModel.add(evaluation, performedOn, instant);
+		if (!rdfModel.contains(evaluation, performedOn)) {
+			rdfModel.add(evaluation, performedOn, instant);
+		}
+		
 
 		/*
 		 * Evaluation and EvaluationData. We used this to store the source ontology IRI
@@ -83,7 +103,7 @@ public class InstanceCreator {
 		}
 
 		/* Quality value */
-		String qualityValueIRI = Namespaces.OQUO_NS + UUID.randomUUID().toString();
+		String qualityValueIRI = Namespaces.OQUO_NS + "qualityValue-" + UUID.randomUUID().toString();
 		Resource qualityValue = rdfModel.createResource(qualityValueIRI, rdfModel.createResource(QUALITY_VALUE));
 		Property hasLiteralValue = rdfModel.createProperty(HAS_LITERAL_VALUE);
 		rdfModel.add(qualityValue, hasLiteralValue, rdfModel.createTypedLiteral(value));
@@ -113,7 +133,42 @@ public class InstanceCreator {
 		/* Measurement scale and ranking function */
 		Property hasRankingFunction = rdfModel.createProperty(HAS_RANKIG_FUNCTION);
 		rdfModel.add(measurementScale, hasRankingFunction, rankingFunction);
-
+		
+		
+		/* OBOE triples */
+		/* Entity */
+		rdfModel.add(evaluationSubject, RDF.type, rdfModel.createResource(ENTITY));
+		
+		/* Measurement value */
+		rdfModel.add(qualityValue, RDF.type, rdfModel.createResource(MEASUREMENT_VALUE));
+		
+		/* Observation */
+		String observationIRI = Namespaces.OQUO_NS + "observation-" + UUID.randomUUID().toString();
+		Resource observation = rdfModel.createResource(observationIRI, rdfModel.createResource(OBSERVATION));
+		rdfModel.add(observation, rdfModel.createProperty(OF_ENTITY), evaluationSubject);
+		rdfModel.add(evaluation, rdfModel.createProperty(HAS_PART), observation);
+		rdfModel.add(observation, performedOn, instant);
+		
+		/* Measurement */
+		String measurementIRI = Namespaces.OQUO_NS + "measurement-" + UUID.randomUUID().toString();
+		Resource measurement = rdfModel.createResource(measurementIRI, rdfModel.createResource(MEASUREMENT));
+		rdfModel.add(measurement, rdfModel.createProperty(MEASUREMENT_FOR), observation);
+		rdfModel.add(observation, rdfModel.createProperty(HAS_MEASUREMENT), measurement);
+		rdfModel.add(measurement, rdfModel.createProperty(HAS_VALUE), qualityValue);
+		
+	}
+	
+	/**
+	 * Generates the IRI for an evaluation instance. This IRI depends on the feature of interest and the ontology version IRI
+	 * @param observationInfo The observation info dto object.
+	 * @return The IRI to use for the evaluation instance.
+	 */
+	public static String getEvaluationIRI(ObservationInfoDTO observationInfo) {
+		
+		String str = observationInfo.getFeatureOfInterestIRI() + observationInfo.getSourceDocumentIRI();
+		UUID id = UUID.nameUUIDFromBytes(str.getBytes());
+		String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + id.toString();
+		return evaluationIRI;
 	}
 
 }
