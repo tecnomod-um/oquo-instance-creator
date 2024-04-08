@@ -2,52 +2,56 @@ package es.um.dis.tecnomod.oquo.dto;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * The Class ObservationInfoDTO.
  */
 public class ObservationInfoDTO implements Serializable {
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -168082823892871235L;
-	
+
 	/** The source document IRI. */
 	private String sourceDocumentIRI;
-	
+
 	/** The feature of interest IRI. */
 	private String featureOfInterestIRI;
-	
+
 	/** The feature of interest type IRI. */
 	private String featureOfInterestTypeIRI;
-	
+
 	/** The observable property IRI. */
 	private String observablePropertyIRI;
-	
+
 	/** The metric used IRI. */
 	private String metricUsedIRI;
-	
+
 	/** The scale IRI. */
 	private String scaleIRI;
-	
+
 	/** The scale type IRI. */
 	private String scaleTypeIRI;
-	
+
 	/** The ranking function IRI. */
 	private String rankingFunctionIRI;
-	
+
 	/** The instrument IRI. */
 	private String instrumentIRI;
-	
+
 	/** The unit of measure IRI. */
 	private String unitOfMeasureIRI;
-	
+
 	/** The value. */
 	private Object value;
-	
+
 	/** The timestamp. */
 	private Calendar timestamp;
-	
+
+	/**  Optional issues to attach to the observation. */
+	private List<IssueInfoDTO> issues;
+
 	/**
 	 * Gets the source document IRI.
 	 *
@@ -56,7 +60,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getSourceDocumentIRI() {
 		return sourceDocumentIRI;
 	}
-	
+
 	/**
 	 * Sets the source document IRI.
 	 *
@@ -65,7 +69,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setSourceDocumentIRI(String sourceDocumentIRI) {
 		this.sourceDocumentIRI = sourceDocumentIRI;
 	}
-	
+
 	/**
 	 * Gets the feature of interest IRI.
 	 *
@@ -74,7 +78,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getFeatureOfInterestIRI() {
 		return featureOfInterestIRI;
 	}
-	
+
 	/**
 	 * Sets the feature of interest IRI.
 	 *
@@ -83,7 +87,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setFeatureOfInterestIRI(String featureOfInterestIRI) {
 		this.featureOfInterestIRI = featureOfInterestIRI;
 	}
-	
+
 	/**
 	 * Gets the feature of interest type IRI.
 	 *
@@ -92,7 +96,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getFeatureOfInterestTypeIRI() {
 		return featureOfInterestTypeIRI;
 	}
-	
+
 	/**
 	 * Sets the feature of interest type IRI.
 	 *
@@ -101,7 +105,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setFeatureOfInterestTypeIRI(String featureOfInterestTypeIRI) {
 		this.featureOfInterestTypeIRI = featureOfInterestTypeIRI;
 	}
-	
+
 	/**
 	 * Gets the observable property IRI.
 	 *
@@ -110,7 +114,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getObservablePropertyIRI() {
 		return observablePropertyIRI;
 	}
-	
+
 	/**
 	 * Sets the observable property IRI.
 	 *
@@ -119,7 +123,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setObservablePropertyIRI(String observablePropertyIRI) {
 		this.observablePropertyIRI = observablePropertyIRI;
 	}
-	
+
 	/**
 	 * Gets the metric used IRI.
 	 *
@@ -128,7 +132,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getMetricUsedIRI() {
 		return metricUsedIRI;
 	}
-	
+
 	/**
 	 * Sets the metric used IRI.
 	 *
@@ -137,7 +141,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setMetricUsedIRI(String metricUsedIRI) {
 		this.metricUsedIRI = metricUsedIRI;
 	}
-	
+
 	/**
 	 * Gets the scale IRI.
 	 *
@@ -146,7 +150,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getScaleIRI() {
 		return scaleIRI;
 	}
-	
+
 	/**
 	 * Sets the scale IRI.
 	 *
@@ -155,7 +159,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setScaleIRI(String scaleIRI) {
 		this.scaleIRI = scaleIRI;
 	}
-	
+
 	/**
 	 * Gets the scale type IRI.
 	 *
@@ -164,7 +168,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getScaleTypeIRI() {
 		return scaleTypeIRI;
 	}
-	
+
 	/**
 	 * Sets the scale type IRI.
 	 *
@@ -173,7 +177,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setScaleTypeIRI(String scaleTypeIRI) {
 		this.scaleTypeIRI = scaleTypeIRI;
 	}
-	
+
 	/**
 	 * Gets the ranking function IRI.
 	 *
@@ -182,7 +186,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getRankingFunctionIRI() {
 		return rankingFunctionIRI;
 	}
-	
+
 	/**
 	 * Sets the ranking function IRI.
 	 *
@@ -191,7 +195,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setRankingFunctionIRI(String rankingFunctionIRI) {
 		this.rankingFunctionIRI = rankingFunctionIRI;
 	}
-	
+
 	/**
 	 * Gets the instrument IRI.
 	 *
@@ -200,7 +204,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getInstrumentIRI() {
 		return instrumentIRI;
 	}
-	
+
 	/**
 	 * Sets the instrument IRI.
 	 *
@@ -209,7 +213,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setInstrumentIRI(String instrumentIRI) {
 		this.instrumentIRI = instrumentIRI;
 	}
-	
+
 	/**
 	 * Gets the unit IRI.
 	 *
@@ -218,7 +222,7 @@ public class ObservationInfoDTO implements Serializable {
 	public String getUnitOfMeasureIRI() {
 		return unitOfMeasureIRI;
 	}
-	
+
 	/**
 	 * Sets the unit IRI.
 	 *
@@ -227,7 +231,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setUnitOfMeasureIRI(String unitIRI) {
 		this.unitOfMeasureIRI = unitIRI;
 	}
-	
+
 	/**
 	 * Gets the value.
 	 *
@@ -236,7 +240,7 @@ public class ObservationInfoDTO implements Serializable {
 	public Object getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * Sets the value.
 	 *
@@ -245,7 +249,7 @@ public class ObservationInfoDTO implements Serializable {
 	public void setValue(Object value) {
 		this.value = value;
 	}
-	
+
 	/**
 	 * Gets the timestamp.
 	 *
@@ -254,7 +258,7 @@ public class ObservationInfoDTO implements Serializable {
 	public Calendar getTimestamp() {
 		return timestamp;
 	}
-	
+
 	/**
 	 * Sets the timestamp.
 	 *
@@ -263,7 +267,25 @@ public class ObservationInfoDTO implements Serializable {
 	public void setTimestamp(Calendar timestamp) {
 		this.timestamp = timestamp;
 	}
-	
+
+	/**
+	 * Gets the issues.
+	 *
+	 * @return the issues
+	 */
+	public List<IssueInfoDTO> getIssues() {
+		return issues;
+	}
+
+	/**
+	 * Sets the issues.
+	 *
+	 * @param issues the new issues
+	 */
+	public void setIssues(List<IssueInfoDTO> issues) {
+		this.issues = issues;
+	}
+
 	/**
 	 * Hash code.
 	 *
@@ -271,11 +293,11 @@ public class ObservationInfoDTO implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(featureOfInterestIRI, featureOfInterestTypeIRI, instrumentIRI, metricUsedIRI,
+		return Objects.hash(featureOfInterestIRI, featureOfInterestTypeIRI, instrumentIRI, issues, metricUsedIRI,
 				observablePropertyIRI, rankingFunctionIRI, scaleIRI, scaleTypeIRI, sourceDocumentIRI, timestamp,
 				unitOfMeasureIRI, value);
 	}
-	
+
 	/**
 	 * Equals.
 	 *
@@ -293,16 +315,16 @@ public class ObservationInfoDTO implements Serializable {
 		ObservationInfoDTO other = (ObservationInfoDTO) obj;
 		return Objects.equals(featureOfInterestIRI, other.featureOfInterestIRI)
 				&& Objects.equals(featureOfInterestTypeIRI, other.featureOfInterestTypeIRI)
-				&& Objects.equals(instrumentIRI, other.instrumentIRI)
+				&& Objects.equals(instrumentIRI, other.instrumentIRI) && Objects.equals(issues, other.issues)
 				&& Objects.equals(metricUsedIRI, other.metricUsedIRI)
 				&& Objects.equals(observablePropertyIRI, other.observablePropertyIRI)
 				&& Objects.equals(rankingFunctionIRI, other.rankingFunctionIRI)
 				&& Objects.equals(scaleIRI, other.scaleIRI) && Objects.equals(scaleTypeIRI, other.scaleTypeIRI)
 				&& Objects.equals(sourceDocumentIRI, other.sourceDocumentIRI)
-				&& Objects.equals(timestamp, other.timestamp) && Objects.equals(unitOfMeasureIRI, other.unitOfMeasureIRI)
-				&& Objects.equals(value, other.value);
+				&& Objects.equals(timestamp, other.timestamp)
+				&& Objects.equals(unitOfMeasureIRI, other.unitOfMeasureIRI) && Objects.equals(value, other.value);
 	}
-	
+
 	/**
 	 * To string.
 	 *
@@ -329,15 +351,16 @@ public class ObservationInfoDTO implements Serializable {
 		builder.append(rankingFunctionIRI);
 		builder.append(", instrumentIRI=");
 		builder.append(instrumentIRI);
-		builder.append(", unitIRI=");
+		builder.append(", unitOfMeasureIRI=");
 		builder.append(unitOfMeasureIRI);
 		builder.append(", value=");
 		builder.append(value);
 		builder.append(", timestamp=");
 		builder.append(timestamp);
+		builder.append(", issues=");
+		builder.append(issues);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
+
 }

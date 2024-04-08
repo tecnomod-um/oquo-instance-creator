@@ -1,6 +1,7 @@
 package es.um.dis.tecnomod.oquo.service;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.jena.rdf.model.Model;
@@ -8,12 +9,15 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
+import es.um.dis.tecnomod.oquo.dto.IssueInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.ObservationInfoDTO;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
 public class InstanceCreator {
 
+	/* Quality model and evaluation result entities */
 	private static final String HAS_RANKIG_FUNCTION = Namespaces.QM_NS + "hasRankigFunction";
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
 	private static final String IS_MEASURED_ON_SCALE = Namespaces.RES_NS + "isMeasuredOnScale";
@@ -32,6 +36,7 @@ public class InstanceCreator {
 	private static final String EVALUATION = Namespaces.RES_NS + "Evaluation";
 	private static final String EVALUATION_SUBJECT = Namespaces.RES_NS + "EvaluationSubject";
 	
+	/* OBOE entities */
 	private static final String ENTITY = Namespaces.OBOE_NS + "Entity";
 	private static final String OBSERVATION = Namespaces.OBOE_NS + "Observation";
 	private static final String MEASUREMENT = Namespaces.OBOE_NS + "Measurement";
@@ -42,6 +47,15 @@ public class InstanceCreator {
 	private static final String HAS_VALUE = Namespaces.OBOE_NS + "hasValue";
 	private static final String MEASUREMENT_FOR = Namespaces.OBOE_NS + "measurementFor";
 	private static final String OF_ENTITY = Namespaces.OBOE_NS + "ofEntity";
+	
+	/* IPO entities */
+	private static final String ASSET = Namespaces.IPO_NS + "Asset";
+	
+	private static final String HAS_HOST_ASSET = Namespaces.IPO_NS + "hasHostAsset";
+	private static final String HOST_ASSET_OF = Namespaces.IPO_NS + "hostAssetOf";
+	
+	/* OQUO entities */
+	private static final String HAS_DETECTED_ISSUE = Namespaces.OQUO_NS + "hasDetectedIssue";
 	
 
 	/**
@@ -156,7 +170,37 @@ public class InstanceCreator {
 		rdfModel.add(observation, rdfModel.createProperty(HAS_MEASUREMENT), measurement);
 		rdfModel.add(measurement, rdfModel.createProperty(HAS_VALUE), qualityValue);
 		
+		
+		/* IPO triples (issues)*/
+		rdfModel.add(evaluationSubject, RDF.type, rdfModel.createResource(ASSET));
+		List<IssueInfoDTO> issuesInfoDTO = observationInfo.getIssues();
+		if (issuesInfoDTO != null) {
+			for (IssueInfoDTO issueInfoDTO : issuesInfoDTO) {
+				/* Issue */
+				String issueIRI = Namespaces.OQUO_NS + "issue-" + UUID.randomUUID().toString();
+				String message = issueInfoDTO.getMessage();
+				Resource issue = rdfModel.createResource(issueIRI, rdfModel.createResource(issueInfoDTO.getIssueType()));
+				
+				/* Issue rdfs:comment message*/
+				rdfModel.add(issue, RDFS.comment, message);
+				
+				/* Issue hasHostAsset Asset */
+				rdfModel.add(issue, rdfModel.createProperty(HAS_HOST_ASSET), evaluationSubject);
+				
+				/* Asset hostAssetOf Issue */
+				rdfModel.add(evaluationSubject, rdfModel.createProperty(HOST_ASSET_OF), issue);
+				
+				/* Evaluation hasDetectedIssue Issue */
+				rdfModel.add(evaluation, rdfModel.createProperty(HAS_DETECTED_ISSUE), issue);
+				
+				/* observation hasDetectedIssue Issue */
+				rdfModel.add(observation, rdfModel.createProperty(HAS_DETECTED_ISSUE), issue);
+			}
+		}
+
 	}
+	
+
 	
 	/**
 	 * Generates the IRI for an evaluation instance. This IRI depends on the feature of interest and the ontology version IRI
@@ -164,7 +208,6 @@ public class InstanceCreator {
 	 * @return The IRI to use for the evaluation instance.
 	 */
 	public static String getEvaluationIRI(ObservationInfoDTO observationInfo) {
-		
 		String str = observationInfo.getFeatureOfInterestIRI() + observationInfo.getSourceDocumentIRI();
 		UUID id = UUID.nameUUIDFromBytes(str.getBytes());
 		String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + id.toString();
