@@ -51,6 +51,9 @@ public class ObservationInfoDTO implements Serializable {
 
 	/**  Optional issues to attach to the observation. */
 	private List<IssueInfoDTO> issues;
+	
+	/** Optional configuration parameters to store together with the evaluation */
+	private List<ConfigurationInfoDTO> configurationDataList;
 
 	/**
 	 * Gets the source document IRI.
@@ -286,24 +289,22 @@ public class ObservationInfoDTO implements Serializable {
 		this.issues = issues;
 	}
 
-	/**
-	 * Hash code.
-	 *
-	 * @return the int
-	 */
-	@Override
-	public int hashCode() {
-		return Objects.hash(featureOfInterestIRI, featureOfInterestTypeIRI, instrumentIRI, issues, metricUsedIRI,
-				observablePropertyIRI, rankingFunctionIRI, scaleIRI, scaleTypeIRI, sourceDocumentIRI, timestamp,
-				unitOfMeasureIRI, value);
+
+	public List<ConfigurationInfoDTO> getConfigurationDataList() {
+		return configurationDataList;
 	}
 
-	/**
-	 * Equals.
-	 *
-	 * @param obj the obj
-	 * @return true, if successful
-	 */
+	public void setConfigurationDataList(List<ConfigurationInfoDTO> configurationDataList) {
+		this.configurationDataList = configurationDataList;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(configurationDataList, featureOfInterestIRI, featureOfInterestTypeIRI, instrumentIRI,
+				issues, metricUsedIRI, observablePropertyIRI, rankingFunctionIRI, scaleIRI, scaleTypeIRI,
+				sourceDocumentIRI, timestamp, unitOfMeasureIRI, value);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -313,7 +314,8 @@ public class ObservationInfoDTO implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ObservationInfoDTO other = (ObservationInfoDTO) obj;
-		return Objects.equals(featureOfInterestIRI, other.featureOfInterestIRI)
+		return Objects.equals(configurationDataList, other.configurationDataList)
+				&& Objects.equals(featureOfInterestIRI, other.featureOfInterestIRI)
 				&& Objects.equals(featureOfInterestTypeIRI, other.featureOfInterestTypeIRI)
 				&& Objects.equals(instrumentIRI, other.instrumentIRI) && Objects.equals(issues, other.issues)
 				&& Objects.equals(metricUsedIRI, other.metricUsedIRI)
@@ -325,11 +327,6 @@ public class ObservationInfoDTO implements Serializable {
 				&& Objects.equals(unitOfMeasureIRI, other.unitOfMeasureIRI) && Objects.equals(value, other.value);
 	}
 
-	/**
-	 * To string.
-	 *
-	 * @return the string
-	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -359,8 +356,11 @@ public class ObservationInfoDTO implements Serializable {
 		builder.append(timestamp);
 		builder.append(", issues=");
 		builder.append(issues);
+		builder.append(", configurationDataList=");
+		builder.append(configurationDataList);
 		builder.append("]");
 		return builder.toString();
 	}
 
+	
 }

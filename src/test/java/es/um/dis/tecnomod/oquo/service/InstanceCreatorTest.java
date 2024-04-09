@@ -5,17 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
+import es.um.dis.tecnomod.oquo.dto.ConfigurationInfoDTO;
+import es.um.dis.tecnomod.oquo.dto.IssueInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.ObservationInfoDTO;
+import es.um.dis.tecnomod.oquo.utils.IssueTypes;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
 class InstanceCreatorTest {
@@ -93,6 +98,59 @@ class InstanceCreatorTest {
 		 * a decimal, a boolean, etc...
 		 */
 		observation.setValue(Integer.valueOf(1));
+		
+		
+		/*
+		 * The configuration used in the evaluation. We use the class ConfigurationInfoDTO:
+		 */
+		ConfigurationInfoDTO configurationInfoDto = new ConfigurationInfoDTO();
+		
+		/*
+		 * We set the IRI to use when creating the configuration instance.
+		 * This allows to reuse the same configuration instance when you have
+		 * many observations with a single configuration. Just make sure that
+		 * the IRI you use is the same for all evaluations sharing the configuration.
+		 */
+		configurationInfoDto.setConfigurationIRI(Namespaces.OQUO_NS + "myconfig");
+		
+		/*
+		 * We set the configuration as a string with a serialization of
+		 * the configuration. This is plain text, you can use xml, json, yaml
+		 * or whatever.
+		 */
+		configurationInfoDto.setSerializedConfiguration("tokenizer_strategy: blank_space\nthreshold: 0.3");
+		
+		/*
+		 * We add the configuration into the observation object. The observation
+		 * has a list of configurations, so you can have more than one configuration
+		 * attached to an evaluation
+		 */
+		List<ConfigurationInfoDTO> configList = Arrays.asList(configurationInfoDto);
+		observation.setConfigurationDataList(configList);
+		
+		
+		
+		/*
+		 * The issues discovered in the observation. We use the class IssueInfoDTO
+		 */
+		IssueInfoDTO issueInfoDTO = new IssueInfoDTO();
+		
+		/*
+		 * We set the message associated with the issue
+		 */
+		issueInfoDTO.setMessage("The class GO:0008150 does not have any name");
+		
+		/*
+		 * We set the type of the issue by assigning its severity
+		 */
+		issueInfoDTO.setIssueType(IssueTypes.MAJOR_ISSUE);
+		
+		/*
+		 * We add the issueInfoDTO object into the observation object.
+		 * The observation object has a list of issues, so it is possible to
+		 * link several issues to the same observation
+		 */
+		observation.setIssues(Arrays.asList(issueInfoDTO));
 		
 		
 		// Add the observation into the jena model

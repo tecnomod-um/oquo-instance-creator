@@ -11,6 +11,7 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import es.um.dis.tecnomod.oquo.dto.ConfigurationInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.IssueInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.ObservationInfoDTO;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
@@ -56,6 +57,11 @@ public class InstanceCreator {
 	
 	/* OQUO entities */
 	private static final String HAS_DETECTED_ISSUE = Namespaces.OQUO_NS + "hasDetectedIssue";
+	private static final String EVALUATION_INPUT_DATA = Namespaces.OQUO_NS + "EvaluationInputData";
+	private static final String EVALUATION_CONFIGURATION_DATA = Namespaces.OQUO_NS + "EvaluationConfigurationData";
+	
+	/* Commons Text Datatype Ontology entities */
+	private static final String HAS_TEXT_VALUE = Namespaces.CMNSTXT_NS + "hasTextValue";
 	
 
 	/**
@@ -107,14 +113,28 @@ public class InstanceCreator {
 		
 
 		/*
-		 * Evaluation and EvaluationData. We used this to store the source ontology IRI
+		 * Evaluation and EvaluationInputData. We used this to store the source ontology IRI
 		 */
+		Property inputData = rdfModel.createProperty(INPUT_DATA);
 		if (sourceDocumentIRI != null) {
-			Resource evaluationData = rdfModel.createResource(sourceDocumentIRI, OWL.Ontology);
-			rdfModel.add(evaluationData, RDF.type, rdfModel.createResource(EVALUATION_DATA));
-			Property inputData = rdfModel.createProperty(INPUT_DATA);
-			rdfModel.add(evaluation, inputData, evaluationData);
+			Resource evaluationInputData = rdfModel.createResource(sourceDocumentIRI, OWL.Ontology);
+			rdfModel.add(evaluationInputData, RDF.type, rdfModel.createResource(EVALUATION_DATA));
+			rdfModel.add(evaluationInputData, RDF.type, rdfModel.createResource(EVALUATION_INPUT_DATA));
+			rdfModel.add(evaluation, inputData, evaluationInputData);
 		}
+		
+		/*
+		 * Evaluation and EvaluationConfigurationData. We used this to store the configuration used in this evaluation
+		 */
+		if (observationInfo.getConfigurationDataList() != null) {
+			for (ConfigurationInfoDTO configurationInfoDTO : observationInfo.getConfigurationDataList()) {
+				Resource evaluationConfigurationData = rdfModel.createResource(configurationInfoDTO.getConfigurationIRI(), rdfModel.createResource(EVALUATION_DATA));
+				rdfModel.add(evaluationConfigurationData, RDF.type, rdfModel.createResource(EVALUATION_CONFIGURATION_DATA));
+				rdfModel.addLiteral(evaluationConfigurationData, rdfModel.createProperty(HAS_TEXT_VALUE), rdfModel.createLiteral(configurationInfoDTO.getSerializedConfiguration()));
+				rdfModel.add(evaluation, inputData,evaluationConfigurationData );
+			}
+		}
+		
 
 		/* Quality value */
 		String qualityValueIRI = Namespaces.OQUO_NS + "qualityValue-" + UUID.randomUUID().toString();
