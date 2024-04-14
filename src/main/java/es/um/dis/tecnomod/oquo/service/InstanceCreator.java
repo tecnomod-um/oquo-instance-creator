@@ -23,14 +23,13 @@ public class InstanceCreator {
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
 	private static final String IS_MEASURED_ON_SCALE = Namespaces.RES_NS + "isMeasuredOnScale";
 	private static final String FOR_MEASURE = Namespaces.RES_NS + "forMeasure";
-	private static final String QUALITY_MEASURE = Namespaces.QM_NS + "QualityMeasure";
+	//private static final String QUALITY_MEASURE = Namespaces.QM_NS + "QualityMeasure";
 	private static final String PRODUCED_QUALITY_VALUE = Namespaces.RES_NS + "producedQualityValue";
 	private static final String OBTAINED_FROM = Namespaces.RES_NS + "obtainedFrom";
 	private static final String HAS_LITERAL_VALUE = Namespaces.RES_NS + "hasLiteralValue";
 	private static final String QUALITY_VALUE = Namespaces.RES_NS + "QualityValue";
 	private static final String INPUT_DATA = Namespaces.RES_NS + "inputData";
 	private static final String EVALUATION_DATA = Namespaces.RES_NS + "EvaluationData";
-	private static final String PERFORMED_ON = Namespaces.RES_NS + "performedOn";
 	private static final String IN_XSD_DATE_TIME = Namespaces.TIME_NS + "inXSDDateTime";
 	private static final String INSTANT = Namespaces.TIME_NS + "Instant";
 	private static final String EVALUATED_SUBJECT = Namespaces.RES_NS + "evaluatedSubject";
@@ -43,7 +42,6 @@ public class InstanceCreator {
 	private static final String MEASUREMENT = Namespaces.OBOE_NS + "Measurement";
 	private static final String MEASUREMENT_VALUE = Namespaces.OBOE_NS + "MeasuredValue";
 	
-	private static final String HAS_PART = Namespaces.BTL2_NS + "hasPart";
 	private static final String HAS_MEASUREMENT = Namespaces.OBOE_NS + "hasMeasurement";
 	private static final String HAS_VALUE = Namespaces.OBOE_NS + "hasValue";
 	private static final String MEASUREMENT_FOR = Namespaces.OBOE_NS + "measurementFor";
@@ -51,17 +49,24 @@ public class InstanceCreator {
 	
 	/* IPO entities */
 	private static final String ASSET = Namespaces.IPO_NS + "Asset";
+	private static final String SYMPTOM = Namespaces.IPO_NS + "Symptom";
 	
 	private static final String HAS_HOST_ASSET = Namespaces.IPO_NS + "hasHostAsset";
 	private static final String HOST_ASSET_OF = Namespaces.IPO_NS + "hostAssetOf";
+	private static final String INDICATES = Namespaces.IPO_NS + "indicates";
+	private static final String INDICATED_BY = Namespaces.IPO_NS + "indicatedBy";
 	
 	/* OQUO entities */
 	private static final String HAS_DETECTED_ISSUE = Namespaces.OQUO_NS + "hasDetectedIssue";
 	private static final String EVALUATION_INPUT_DATA = Namespaces.OQUO_NS + "EvaluationInputData";
 	private static final String EVALUATION_CONFIGURATION_DATA = Namespaces.OQUO_NS + "EvaluationConfigurationData";
+	private static final String HAS_OBSERVATION = Namespaces.OQUO_NS + "hasObservation";
 	
 	/* Commons Text Datatype Ontology entities */
 	private static final String HAS_TEXT_VALUE = Namespaces.CMNSTXT_NS + "hasTextValue";
+	
+	/* Time ontology */
+	private static final String HAS_TIME = Namespaces.TIME_NS + "hasTime";
 	
 
 	/**
@@ -87,8 +92,7 @@ public class InstanceCreator {
 		/* Evaluation result triples */
 
 		/* Evaluation and evaluationSubject */
-		//String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + UUID.randomUUID().toString();
-		String evaluationIRI = getEvaluationIRI(observationInfo);
+		String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + UUID.randomUUID().toString();
 		Resource evaluationSubject = rdfModel.createResource(featureOfInterestIRI,
 				rdfModel.createResource(EVALUATION_SUBJECT));
 		Resource evaluation = rdfModel.createResource(evaluationIRI, rdfModel.createResource(EVALUATION));
@@ -106,7 +110,7 @@ public class InstanceCreator {
 		rdfModel.add(instant, inXSDDateTime, rdfModel.createTypedLiteral(timestamp));
 		
 		/* Evaluation and instant */
-		Property performedOn = rdfModel.createProperty(PERFORMED_ON);
+		Property performedOn = rdfModel.createProperty(HAS_TIME);
 		if (!rdfModel.contains(evaluation, performedOn)) {
 			rdfModel.add(evaluation, performedOn, instant);
 		}
@@ -149,7 +153,8 @@ public class InstanceCreator {
 		rdfModel.add(evaluation, producedQualityValue, qualityValue);
 
 		/* Quality value and quality measure */
-		Resource qualityMeasure = rdfModel.createResource(metricUsedIRI, rdfModel.createResource(QUALITY_MEASURE));
+		String qualityMeasureIRI = Namespaces.OQUO_NS + "metric-" + UUID.randomUUID().toString();
+		Resource qualityMeasure = rdfModel.createResource(qualityMeasureIRI, rdfModel.createResource(metricUsedIRI));
 		Property forMeasure = rdfModel.createProperty(FOR_MEASURE);
 		rdfModel.add(qualityValue, forMeasure, qualityMeasure);
 
@@ -180,21 +185,22 @@ public class InstanceCreator {
 		String observationIRI = Namespaces.OQUO_NS + "observation-" + UUID.randomUUID().toString();
 		Resource observation = rdfModel.createResource(observationIRI, rdfModel.createResource(OBSERVATION));
 		rdfModel.add(observation, rdfModel.createProperty(OF_ENTITY), evaluationSubject);
-		rdfModel.add(evaluation, rdfModel.createProperty(HAS_PART), observation);
+		rdfModel.add(evaluation, rdfModel.createProperty(HAS_OBSERVATION), observation);
 		rdfModel.add(observation, performedOn, instant);
 		
 		/* Measurement */
-		String measurementIRI = Namespaces.OQUO_NS + "measurement-" + UUID.randomUUID().toString();
-		Resource measurement = rdfModel.createResource(measurementIRI, rdfModel.createResource(MEASUREMENT));
-		rdfModel.add(measurement, rdfModel.createProperty(MEASUREMENT_FOR), observation);
-		rdfModel.add(observation, rdfModel.createProperty(HAS_MEASUREMENT), measurement);
-		rdfModel.add(measurement, rdfModel.createProperty(HAS_VALUE), qualityValue);
+		rdfModel.add(qualityMeasure, RDF.type, rdfModel.createResource(MEASUREMENT));
+		rdfModel.add(qualityMeasure, rdfModel.createProperty(MEASUREMENT_FOR), observation);
+		rdfModel.add(observation, rdfModel.createProperty(HAS_MEASUREMENT), qualityMeasure);
+		rdfModel.add(qualityMeasure, rdfModel.createProperty(HAS_VALUE), qualityValue);
 		
 		
 		/* IPO triples (issues)*/
-		rdfModel.add(evaluationSubject, RDF.type, rdfModel.createResource(ASSET));
+		
 		List<IssueInfoDTO> issuesInfoDTO = observationInfo.getIssues();
-		if (issuesInfoDTO != null) {
+		if (issuesInfoDTO != null && !issuesInfoDTO.isEmpty()) {
+			rdfModel.add(evaluationSubject, RDF.type, rdfModel.createResource(ASSET));
+			rdfModel.add(observation, RDF.type, rdfModel.createResource(SYMPTOM));
 			for (IssueInfoDTO issueInfoDTO : issuesInfoDTO) {
 				/* Issue */
 				String issueIRI = Namespaces.OQUO_NS + "issue-" + UUID.randomUUID().toString();
@@ -213,8 +219,11 @@ public class InstanceCreator {
 				/* Evaluation hasDetectedIssue Issue */
 				rdfModel.add(evaluation, rdfModel.createProperty(HAS_DETECTED_ISSUE), issue);
 				
-				/* observation hasDetectedIssue Issue */
-				rdfModel.add(observation, rdfModel.createProperty(HAS_DETECTED_ISSUE), issue);
+				/* observation indicates Issue */
+				rdfModel.add(observation, rdfModel.createProperty(INDICATES), issue);
+				
+				/* issue indicated by observation */
+				rdfModel.add(issue, rdfModel.createProperty(INDICATED_BY), observation);
 			}
 		}
 

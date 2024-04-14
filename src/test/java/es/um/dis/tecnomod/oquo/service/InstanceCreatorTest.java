@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
@@ -159,6 +160,7 @@ class InstanceCreatorTest {
 		
 		// Optionally you can check if the rdf data conforms the ontology
 		ValidationReport report = RDFValidator.validate(model);
+		ShLib.printReport(report);
 		assertTrue(report.conforms());
 		
 		// Optionally, you can include a map with the prefixes to use. The Namespaces can provide this map.
@@ -185,10 +187,11 @@ class InstanceCreatorTest {
 		assertFalse(model.isEmpty());
 		
 		ValidationReport report = RDFValidator.validate(model);
+		ShLib.printReport(report);
 		assertTrue(report.conforms());
 		
 		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
-		assertEquals(2, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
+		assertEquals(3, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 		model.setNsPrefixes(Namespaces.getPrefixMap());
 		model.write(System.out, "TURTLE");
 		

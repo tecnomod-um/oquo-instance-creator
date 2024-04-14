@@ -1,8 +1,9 @@
 package es.um.dis.tecnomod.oquo.service;
 
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
@@ -18,8 +19,32 @@ public class RDFValidator {
 	 * @return ValidationReport
 	 */
 	public static ValidationReport validate(Model instances) {
-		Model ontology = RDFDataMgr.loadModel(OQUO_ONTOLOGY, Lang.RDFXML);
+		OntModel ontology = ModelFactory.createOntologyModel();
+		ontology.setDerivationLogging(false);
+		ontology.read(OQUO_ONTOLOGY, Lang.RDFXML.getName());
 		ontology.add(instances);
+		///////////
+//		Resource evaluationResult = ontology.getResource("http://purl.org/net/EvaluationResult#");
+//		Resource measurement = ontology.getResource("http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#Measurement");
+//		Resource qualityMeasure = ontology.getResource("http://purl.org/net/QualityModel#QualityMeasure");
+//		Statement statementToTest = ontology.asStatement(new Triple(evaluationResult.asNode(), RDF.type.asNode(), qualityMeasure.asNode()));
+//		RDFSRuleInfGraph g = (RDFSRuleInfGraph) ontology.getGraph();
+//
+//		if (g.contains(statementToTest.asTriple())) {
+//			PrintWriter out = new PrintWriter(System.out);
+//		    System.out.println("Statement is " + statementToTest);
+//		    for (Iterator<Derivation> id = ontology.getDerivation(statementToTest); id.hasNext(); ) {
+//		        Derivation deriv = (Derivation) id.next();
+//		        deriv.printTrace(out, true);
+//		        out.flush();
+//		    }
+//			
+//			
+//		}
+//		g.getRules().forEach(rule -> {
+//			System.out.println(rule);
+//		});
+		/////////////////////////
 		Shapes shapes = Shapes.parse(OQUO_SHAPES);
 		ValidationReport validationReport = ShaclValidator.get().validate(shapes, ontology.getGraph());
 		return validationReport;
