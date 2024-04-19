@@ -31,7 +31,7 @@ class RDFValidatorTest {
 		
 		ValidationReport report = RDFValidator.validate(model);
 		assertTrue(report.conforms());
-		ShLib.printReport(report);
+		//ShLib.printReport(report);
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ class RDFValidatorTest {
 		
 		ValidationReport report = RDFValidator.validate(model);
 		assertFalse(report.conforms());
-		ShLib.printReport(report);
+		//ShLib.printReport(report);
 		
 	}
 
@@ -54,7 +54,7 @@ class RDFValidatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#NamesPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#namesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#NamesPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
@@ -71,7 +71,7 @@ class RDFValidatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#descriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
@@ -88,7 +88,7 @@ class RDFValidatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#descriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);

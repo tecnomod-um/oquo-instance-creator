@@ -77,9 +77,10 @@ class InstanceCreatorTest {
 		/*
 		 * The IRI of the scale used by the measure. - I was using the same as the
 		 * metric iri plus the word "Scale", so that every measure with the same metric
-		 * is related to the same scale instance.
+		 * is related to the same scale instance. Now, these scales exist in the oquo
+		 * ontology; so you have to create the scale in the ontology to link it.
 		 */
-		observation.setScaleIRI("https://purl.archive.org/oquo#namesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#NamesPerClassMetricScale");
 
 		/*
 		 * The type of the scale used by the measure - I was using
@@ -160,7 +161,7 @@ class InstanceCreatorTest {
 		
 		// Optionally you can check if the rdf data conforms the ontology
 		ValidationReport report = RDFValidator.validate(model);
-		ShLib.printReport(report);
+		// ShLib.printReport(report);  // Print report with detected violations.
 		assertTrue(report.conforms());
 		
 		// Optionally, you can include a map with the prefixes to use. The Namespaces can provide this map.
@@ -169,7 +170,8 @@ class InstanceCreatorTest {
 		// See the rdf
 		// You can use "TURTLE", "NTRIPLES", "TRIG", "RDFXML"...
 		// You can use a FileOutputStream instead of System.out to write to a file.
-		model.write(System.out, "TURTLE");
+		//model.write(System.out, "TURTLE");
+		model.write(System.out, "NTRIPLES");
 	}
 	
 	@Test
@@ -187,11 +189,32 @@ class InstanceCreatorTest {
 		assertFalse(model.isEmpty());
 		
 		ValidationReport report = RDFValidator.validate(model);
-		ShLib.printReport(report);
+		//ShLib.printReport(report);
 		assertTrue(report.conforms());
 		
 		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
 		assertEquals(3, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
+//		model.setNsPrefixes(Namespaces.getPrefixMap());
+//		model.write(System.out, "TURTLE");
+		
+	}
+	
+	@Test
+	void testCreateObservation3() {
+		Model model = ModelFactory.createDefaultModel();
+		assertTrue(model.isEmpty());
+		
+		ObservationInfoDTO observation4 = createObservation4();
+		
+		InstanceCreator.createObservation(model, observation4);
+		assertFalse(model.isEmpty());
+		
+		ValidationReport report = RDFValidator.validate(model);
+		//ShLib.printReport(report);
+		assertTrue(report.conforms());
+		
+		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
+		assertEquals(1, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 		model.setNsPrefixes(Namespaces.getPrefixMap());
 		model.write(System.out, "TURTLE");
 		
@@ -202,9 +225,6 @@ class InstanceCreatorTest {
 		ObservationInfoDTO observation1 = createObservation1();
 		ObservationInfoDTO observation2 = createObservation2();
 		ObservationInfoDTO observation3 = createObservation3();
-		System.out.println(InstanceCreator.getEvaluationIRI(observation1));
-		System.out.println(InstanceCreator.getEvaluationIRI(observation2));
-		System.out.println(InstanceCreator.getEvaluationIRI(observation3));
 		assertEquals(InstanceCreator.getEvaluationIRI(observation1), InstanceCreator.getEvaluationIRI(observation2));
 		assertNotEquals(InstanceCreator.getEvaluationIRI(observation1), InstanceCreator.getEvaluationIRI(observation3));
 	}
@@ -218,7 +238,7 @@ class InstanceCreatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#NamesPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#namesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#NamesPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
@@ -235,7 +255,7 @@ class InstanceCreatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#descriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
@@ -252,11 +272,28 @@ class InstanceCreatorTest {
 		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#descriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Double.valueOf(0.85));
+		return observation;
+	}
+	
+	private ObservationInfoDTO createObservation4() {
+		ObservationInfoDTO observation = new ObservationInfoDTO();
+		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
+		observation.setInstrumentIRI(null);
+		observation.setMetricUsedIRI("https://purl.archive.org/oquo#LackOfCohesionInMethodsMetric");
+		observation.setObservablePropertyIRI(null);
+		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#LowerBest");
+		observation.setScaleIRI("https://purl.archive.org/oquo#LackOfCohesionInMethodsMetricScale");
+		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setTimestamp(Calendar.getInstance());
+		observation.setUnitOfMeasureIRI(null);
+		observation.setValue(Double.valueOf(5));
 		return observation;
 	}
 

@@ -173,6 +173,9 @@ public class InstanceCreator {
 		Property hasRankingFunction = rdfModel.createProperty(HAS_RANKIG_FUNCTION);
 		rdfModel.add(measurementScale, hasRankingFunction, rankingFunction);
 		
+		/* QualityMeasure and measurement scale */
+		Property hasScale = rdfModel.createProperty(Namespaces.QM_NS + "hasScale");
+		rdfModel.add(qualityMeasure, hasScale, measurementScale);
 		
 		/* OBOE triples */
 		/* Entity */
