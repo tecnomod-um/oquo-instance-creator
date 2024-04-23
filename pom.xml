@@ -8,7 +8,6 @@
 
 	<properties>
 		<jena.version>3.17.0</jena.version>
-		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 
 	<build>
@@ -59,4 +58,27 @@
 		</dependency>
 
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>java17</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<profile.name>java17</profile.name>
+				<maven.compiler.release>17</maven.compiler.release>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>java8</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<profile.name>java8</profile.name>
+				<maven.compiler.release>8</maven.compiler.release>
+			</properties>
+		</profile>
+	</profiles>
 </project>
