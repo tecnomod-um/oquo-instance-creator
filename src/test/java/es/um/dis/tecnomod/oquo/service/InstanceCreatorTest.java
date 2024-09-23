@@ -94,7 +94,10 @@ class InstanceCreatorTest {
 
 		/* The IRI of the unit of measure - NOT USED */
 		observation.setUnitOfMeasureIRI(null);
-
+		
+		/* Comments on the value */
+		observation.setDetails(Arrays.asList("This is a comment with details about the value.", "This is another comment with details about the value."));
+		
 		/*
 		 * The value of the observation. This is an object, so you can pass an integer,
 		 * a decimal, a boolean, etc...
@@ -161,7 +164,7 @@ class InstanceCreatorTest {
 		
 		// Optionally you can check if the rdf data conforms the ontology
 		ValidationReport report = RDFValidator.validate(model);
-		// ShLib.printReport(report);  // Print report with detected violations.
+		ShLib.printReport(report);  // Print report with detected violations.
 		assertTrue(report.conforms());
 		
 		// Optionally, you can include a map with the prefixes to use. The Namespaces can provide this map.

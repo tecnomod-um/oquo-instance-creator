@@ -86,6 +86,7 @@ public class InstanceCreator {
 		String scaleIRI = observationInfo.getScaleIRI();
 		String scaleTypeIRI = observationInfo.getScaleTypeIRI();
 		String rankingFunctionIRI = observationInfo.getRankingFunctionIRI();
+		List<String> details = observationInfo.getDetails();
 		Object value = observationInfo.getValue();
 		Calendar timestamp = observationInfo.getTimestamp();
 		
@@ -145,6 +146,13 @@ public class InstanceCreator {
 		Resource qualityValue = rdfModel.createResource(qualityValueIRI, rdfModel.createResource(QUALITY_VALUE));
 		Property hasLiteralValue = rdfModel.createProperty(HAS_LITERAL_VALUE);
 		rdfModel.add(qualityValue, hasLiteralValue, rdfModel.createTypedLiteral(value));
+		
+		/* Quality value and comments (details) */
+		if (details != null && !details.isEmpty()) {
+			for (String detail : details) {
+				rdfModel.add(qualityValue, RDFS.comment, rdfModel.createTypedLiteral(detail));
+			}
+		}
 
 		/* Quality value and evaluation */
 		Property obtainedFrom = rdfModel.createProperty(OBTAINED_FROM);

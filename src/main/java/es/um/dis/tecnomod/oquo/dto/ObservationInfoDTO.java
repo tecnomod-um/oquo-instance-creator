@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ObservationInfoDTO.
  */
@@ -48,11 +49,14 @@ public class ObservationInfoDTO implements Serializable {
 
 	/** The timestamp. */
 	private Calendar timestamp;
+	
+	/** The details. */
+	private List<String> details;
 
 	/**  Optional issues to attach to the observation. */
 	private List<IssueInfoDTO> issues;
 	
-	/** Optional configuration parameters to store together with the evaluation */
+	/**  Optional configuration parameters to store together with the evaluation. */
 	private List<ConfigurationInfoDTO> configurationDataList;
 
 	/**
@@ -290,18 +294,46 @@ public class ObservationInfoDTO implements Serializable {
 	}
 
 
+	/**
+	 * Gets the configuration data list.
+	 *
+	 * @return the configuration data list
+	 */
 	public List<ConfigurationInfoDTO> getConfigurationDataList() {
 		return configurationDataList;
 	}
 
+	/**
+	 * Sets the configuration data list.
+	 *
+	 * @param configurationDataList the new configuration data list
+	 */
 	public void setConfigurationDataList(List<ConfigurationInfoDTO> configurationDataList) {
 		this.configurationDataList = configurationDataList;
 	}
 
+	/**
+	 * Gets the details.
+	 *
+	 * @return the details
+	 */
+	public List<String> getDetails() {
+		return details;
+	}
+
+	/**
+	 * Sets the details.
+	 *
+	 * @param details the new details
+	 */
+	public void setDetails(List<String> details) {
+		this.details = details;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(configurationDataList, featureOfInterestIRI, featureOfInterestTypeIRI, instrumentIRI,
-				issues, metricUsedIRI, observablePropertyIRI, rankingFunctionIRI, scaleIRI, scaleTypeIRI,
+		return Objects.hash(configurationDataList, details, featureOfInterestIRI, featureOfInterestTypeIRI,
+				instrumentIRI, issues, metricUsedIRI, observablePropertyIRI, rankingFunctionIRI, scaleIRI, scaleTypeIRI,
 				sourceDocumentIRI, timestamp, unitOfMeasureIRI, value);
 	}
 
@@ -315,6 +347,7 @@ public class ObservationInfoDTO implements Serializable {
 			return false;
 		ObservationInfoDTO other = (ObservationInfoDTO) obj;
 		return Objects.equals(configurationDataList, other.configurationDataList)
+				&& Objects.equals(details, other.details)
 				&& Objects.equals(featureOfInterestIRI, other.featureOfInterestIRI)
 				&& Objects.equals(featureOfInterestTypeIRI, other.featureOfInterestTypeIRI)
 				&& Objects.equals(instrumentIRI, other.instrumentIRI) && Objects.equals(issues, other.issues)
@@ -354,6 +387,8 @@ public class ObservationInfoDTO implements Serializable {
 		builder.append(value);
 		builder.append(", timestamp=");
 		builder.append(timestamp);
+		builder.append(", details=");
+		builder.append(details);
 		builder.append(", issues=");
 		builder.append(issues);
 		builder.append(", configurationDataList=");
@@ -361,6 +396,8 @@ public class ObservationInfoDTO implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
+	
+	
 
 	
 }
