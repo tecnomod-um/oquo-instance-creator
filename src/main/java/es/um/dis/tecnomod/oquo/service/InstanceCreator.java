@@ -53,6 +53,8 @@ public class InstanceCreator {
 	
 	private static final String HAS_HOST_ASSET = Namespaces.IPO_NS + "hasHostAsset";
 	private static final String HOST_ASSET_OF = Namespaces.IPO_NS + "hostAssetOf";
+	private static final String HAS_CAUSATIVE_ASSET = Namespaces.IPO_NS + "hasCausativeAsset";
+	private static final String CAUSATIVE_ASSET_OF = Namespaces.IPO_NS + "causativeAssetOf";
 	private static final String INDICATES = Namespaces.IPO_NS + "indicates";
 	private static final String INDICATED_BY = Namespaces.IPO_NS + "indicatedBy";
 	
@@ -210,9 +212,9 @@ public class InstanceCreator {
 		
 		List<IssueInfoDTO> issuesInfoDTO = observationInfo.getIssues();
 		if (issuesInfoDTO != null && !issuesInfoDTO.isEmpty()) {
-			rdfModel.add(evaluationSubject, RDF.type, rdfModel.createResource(ASSET));
 			rdfModel.add(observation, RDF.type, rdfModel.createResource(SYMPTOM));
 			for (IssueInfoDTO issueInfoDTO : issuesInfoDTO) {
+				Resource hostAsset = rdfModel.createResource(issueInfoDTO.getHostAsset(), rdfModel.createResource(ASSET));
 				/* Issue */
 				String issueIRI = Namespaces.OQUO_NS + "issue-" + UUID.randomUUID().toString();
 				String message = issueInfoDTO.getMessage();
@@ -222,10 +224,10 @@ public class InstanceCreator {
 				rdfModel.add(issue, RDFS.comment, message);
 				
 				/* Issue hasHostAsset Asset */
-				rdfModel.add(issue, rdfModel.createProperty(HAS_HOST_ASSET), evaluationSubject);
+				rdfModel.add(issue, rdfModel.createProperty(HAS_HOST_ASSET), hostAsset);
 				
 				/* Asset hostAssetOf Issue */
-				rdfModel.add(evaluationSubject, rdfModel.createProperty(HOST_ASSET_OF), issue);
+				rdfModel.add(hostAsset, rdfModel.createProperty(HOST_ASSET_OF), issue);
 				
 				/* Evaluation hasDetectedIssue Issue */
 				rdfModel.add(evaluation, rdfModel.createProperty(HAS_DETECTED_ISSUE), issue);
@@ -235,6 +237,17 @@ public class InstanceCreator {
 				
 				/* issue indicated by observation */
 				rdfModel.add(issue, rdfModel.createProperty(INDICATED_BY), observation);
+				
+				/* If there is causative asset... */
+				if (issueInfoDTO.getCausativeAsset() != null && !issueInfoDTO.getCausativeAsset().isEmpty()) {
+					Resource causativeAsset = rdfModel.createResource(issueInfoDTO.getCausativeAsset(), rdfModel.createResource(ASSET));
+					
+					/* Issue hasCausativeAsset Asset */
+					rdfModel.add(issue, rdfModel.createProperty(HAS_CAUSATIVE_ASSET), causativeAsset);
+					
+					/* Asset causativeAssetOf Issue */
+					rdfModel.add(causativeAsset, rdfModel.createProperty(CAUSATIVE_ASSET_OF), issue);
+				}
 			}
 		}
 

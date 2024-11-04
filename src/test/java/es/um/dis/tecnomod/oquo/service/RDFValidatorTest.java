@@ -30,8 +30,8 @@ class RDFValidatorTest {
 		assertFalse(model.isEmpty());
 		
 		ValidationReport report = RDFValidator.validate(model);
+		ShLib.printReport(report);
 		assertTrue(report.conforms());
-		//ShLib.printReport(report);
 	}
 	
 	@Test

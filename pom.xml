@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.um.dis.tecnomod</groupId>
 	<artifactId>oquo-instance-creator</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.3</version>
 
 	<properties>
 		<jena.version>3.17.0</jena.version>
@@ -62,7 +62,7 @@
 		<profile>
 			<id>java17</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
 				<profile.name>java17</profile.name>
@@ -73,7 +73,7 @@
 		<profile>
 			<id>java8</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<profile.name>java8</profile.name>
