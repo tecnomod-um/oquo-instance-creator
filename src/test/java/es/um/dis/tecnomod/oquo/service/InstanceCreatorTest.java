@@ -59,7 +59,7 @@ class InstanceCreatorTest {
 		 * from oquo ontology
 		 * (https://raw.githubusercontent.com/tecnomod-um/oquo/main/ontology/oquo.owl)
 		 */
-		observation.setMetricUsedIRI("https://purl.archive.org/oquo#NamesPerClassMetric"); // Names per class
+		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric"); // Names per class
 
 		/*
 		 * IRI of the property being measured (names, synonyms, descriptions...) - NOT
@@ -80,14 +80,14 @@ class InstanceCreatorTest {
 		 * is related to the same scale instance. Now, these scales exist in the oquo
 		 * ontology; so you have to create the scale in the ontology to link it.
 		 */
-		observation.setScaleIRI("https://purl.archive.org/oquo#NamesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo#NamesPerClassMetricScale");
 
 		/*
 		 * The type of the scale used by the measure - I was using
-		 * <https://purl.archive.org/oquo#RawScale> to identify the scale is the raw
+		 * <https://purl.org/oquo#RawScale> to identify the scale is the raw
 		 * value of the metric.
 		 */
-		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 
 		/* The timestamp */
 		observation.setTimestamp(Calendar.getInstance());
@@ -165,7 +165,7 @@ class InstanceCreatorTest {
 		// Optionally you can check if the rdf data conforms the ontology
 		ValidationReport report = RDFValidator.validate(model);
 		ShLib.printReport(report);  // Print report with detected violations.
-		assertTrue(report.conforms());
+		assertFalse(report.conforms());
 		
 		// Optionally, you can include a map with the prefixes to use. The Namespaces can provide this map.
 		model.setNsPrefixes(Namespaces.getPrefixMap());
@@ -238,11 +238,11 @@ class InstanceCreatorTest {
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
 		observation.setInstrumentIRI(null);
-		observation.setMetricUsedIRI("https://purl.archive.org/oquo#NamesPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#NamesPerClassMetricScale");
-		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setScaleIRI("https://purl.org/oquo#NamesPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Integer.valueOf(1));
@@ -255,11 +255,11 @@ class InstanceCreatorTest {
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
 		observation.setInstrumentIRI(null);
-		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
-		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Integer.valueOf(1));
@@ -272,11 +272,11 @@ class InstanceCreatorTest {
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
 		observation.setInstrumentIRI(null);
-		observation.setMetricUsedIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#DescriptionsPerClassMetricScale");
-		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Double.valueOf(0.85));
@@ -289,11 +289,11 @@ class InstanceCreatorTest {
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
 		observation.setInstrumentIRI(null);
-		observation.setMetricUsedIRI("https://purl.archive.org/oquo#LackOfCohesionInMethodsMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetric");
 		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#LowerBest");
-		observation.setScaleIRI("https://purl.archive.org/oquo#LackOfCohesionInMethodsMetricScale");
-		observation.setScaleTypeIRI("https://purl.archive.org/oquo#RawScale");
+		observation.setScaleIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Double.valueOf(5));

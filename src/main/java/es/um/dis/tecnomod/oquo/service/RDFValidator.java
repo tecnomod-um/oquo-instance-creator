@@ -10,7 +10,7 @@ import org.apache.jena.shacl.ValidationReport;
 
 
 public class RDFValidator {
-	private static final String OQUO_ONTOLOGY = "https://purl.archive.org/oquo";
+	private static final String OQUO_ONTOLOGY = "https://purl.org/oquo";
 	//private static final String OQUO_ONTOLOGY = "/home/fabad/ontologies/oquo/ontology/oquo.owl";
 	
 	private static final String OQUO_SHAPES = "https://raw.githubusercontent.com/tecnomod-um/oquo/main/shacl_eval.ttl";

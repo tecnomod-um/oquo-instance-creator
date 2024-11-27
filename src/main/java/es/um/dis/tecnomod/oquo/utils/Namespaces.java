@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Namespaces {
-	public static final String OQUO_NS = "https://purl.archive.org/oquo#";
+	public static final String OQUO_NS = "https://purl.org/oquo#";
 	public static final String PROV_NS = "http://www.w3.org/ns/prov#";
 	public static final String QM_NS = "http://purl.org/net/QualityModel#";
 	public static final String RES_NS = "http://purl.org/net/EvaluationResult#";

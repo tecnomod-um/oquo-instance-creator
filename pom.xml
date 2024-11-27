@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.um.dis.tecnomod</groupId>
 	<artifactId>oquo-instance-creator</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 
 	<properties>
 		<jena.version>3.17.0</jena.version>
