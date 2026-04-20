@@ -51,9 +51,6 @@ class InstanceCreatorTest {
 		 */
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI()); // "owl:Class"
 
-		/* IRI of the instrument used to perform the observation - NOT USED */
-		observation.setInstrumentIRI(null);
-
 		/*
 		 * IRI of the metric used to measure the feature of interest. Normally taken
 		 * from oquo ontology
@@ -61,11 +58,6 @@ class InstanceCreatorTest {
 		 */
 		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric"); // Names per class
 
-		/*
-		 * IRI of the property being measured (names, synonyms, descriptions...) - NOT
-		 * USED
-		 */
-		observation.setObservablePropertyIRI(null);
 
 		/*
 		 * IRI of the ranking function, which can be
@@ -92,24 +84,22 @@ class InstanceCreatorTest {
 		/* The timestamp */
 		observation.setTimestamp(Calendar.getInstance());
 
-		/* The IRI of the unit of measure - NOT USED */
-		observation.setUnitOfMeasureIRI(null);
-		
+
 		/* Comments on the value */
 		observation.setDetails(Arrays.asList("This is a comment with details about the value.", "This is another comment with details about the value."));
-		
+
 		/*
 		 * The value of the observation. This is an object, so you can pass an integer,
 		 * a decimal, a boolean, etc...
 		 */
 		observation.setValue(Integer.valueOf(1));
-		
-		
+
+
 		/*
 		 * The configuration used in the evaluation. We use the class ConfigurationInfoDTO:
 		 */
 		ConfigurationInfoDTO configurationInfoDto = new ConfigurationInfoDTO();
-		
+
 		/*
 		 * We set the IRI to use when creating the configuration instance.
 		 * This allows to reuse the same configuration instance when you have
@@ -117,14 +107,14 @@ class InstanceCreatorTest {
 		 * the IRI you use is the same for all evaluations sharing the configuration.
 		 */
 		configurationInfoDto.setConfigurationIRI(Namespaces.OQUO_NS + "myconfig");
-		
+
 		/*
 		 * We set the configuration as a string with a serialization of
 		 * the configuration. This is plain text, you can use xml, json, yaml
 		 * or whatever.
 		 */
 		configurationInfoDto.setSerializedConfiguration("tokenizer_strategy: blank_space\nthreshold: 0.3");
-		
+
 		/*
 		 * We add the configuration into the observation object. The observation
 		 * has a list of configurations, so you can have more than one configuration
@@ -132,97 +122,97 @@ class InstanceCreatorTest {
 		 */
 		List<ConfigurationInfoDTO> configList = Arrays.asList(configurationInfoDto);
 		observation.setConfigurationDataList(configList);
-		
-		
-		
+
+
+
 		/*
 		 * The issues discovered in the observation. We use the class IssueInfoDTO
 		 */
 		IssueInfoDTO issueInfoDTO = new IssueInfoDTO();
-		
+
 		/*
 		 * We set the message associated with the issue
 		 */
 		issueInfoDTO.setMessage("The class GO:0008150 does not have any name");
-		
+
 		/*
 		 * We set the type of the issue by assigning its severity
 		 */
 		issueInfoDTO.setIssueType(IssueTypes.MAJOR_ISSUE);
-		
+
 		/*
 		 * We add the issueInfoDTO object into the observation object.
 		 * The observation object has a list of issues, so it is possible to
 		 * link several issues to the same observation
 		 */
 		observation.setIssues(Arrays.asList(issueInfoDTO));
-		
-		
+
+
 		// Add the observation into the jena model
 		InstanceCreator.createObservation(model, observation);
 		assertFalse(model.isEmpty());
-		
+
 		// Optionally you can check if the rdf data conforms the ontology
 		ValidationReport report = RDFValidator.validate(model);
 		ShLib.printReport(report);  // Print report with detected violations.
 		assertFalse(report.conforms());
-		
+
 		// Optionally, you can include a map with the prefixes to use. The Namespaces can provide this map.
 		model.setNsPrefixes(Namespaces.getPrefixMap());
-		
+
 		// See the rdf
 		// You can use "TURTLE", "NTRIPLES", "TRIG", "RDFXML"...
 		// You can use a FileOutputStream instead of System.out to write to a file.
 		//model.write(System.out, "TURTLE");
 		model.write(System.out, "NTRIPLES");
 	}
-	
+
 	@Test
 	void testCreateObservation2() {
 		Model model = ModelFactory.createDefaultModel();
 		assertTrue(model.isEmpty());
-		
+
 		ObservationInfoDTO observation1 = createObservation1();
 		ObservationInfoDTO observation2 = createObservation2();
 		ObservationInfoDTO observation3 = createObservation3();
-		
+
 		InstanceCreator.createObservation(model, observation1);
 		InstanceCreator.createObservation(model, observation2);
 		InstanceCreator.createObservation(model, observation3);
 		assertFalse(model.isEmpty());
-		
+
 		ValidationReport report = RDFValidator.validate(model);
 		//ShLib.printReport(report);
 		assertTrue(report.conforms());
-		
+
 		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
 		assertEquals(3, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 //		model.setNsPrefixes(Namespaces.getPrefixMap());
 //		model.write(System.out, "TURTLE");
-		
+
 	}
-	
+
 	@Test
 	void testCreateObservation3() {
 		Model model = ModelFactory.createDefaultModel();
 		assertTrue(model.isEmpty());
-		
+
 		ObservationInfoDTO observation4 = createObservation4();
-		
+
 		InstanceCreator.createObservation(model, observation4);
 		assertFalse(model.isEmpty());
-		
+
 		ValidationReport report = RDFValidator.validate(model);
 		//ShLib.printReport(report);
 		assertTrue(report.conforms());
-		
+
 		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
 		assertEquals(1, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 		model.setNsPrefixes(Namespaces.getPrefixMap());
 		model.write(System.out, "TURTLE");
-		
+
 	}
-	
+
 	@Test
 	void testGetEvaluationIRI() {
 		ObservationInfoDTO observation1 = createObservation1();
@@ -231,71 +221,59 @@ class InstanceCreatorTest {
 		assertEquals(InstanceCreator.getEvaluationIRI(observation1), InstanceCreator.getEvaluationIRI(observation2));
 		assertNotEquals(InstanceCreator.getEvaluationIRI(observation1), InstanceCreator.getEvaluationIRI(observation3));
 	}
-	
+
 	private ObservationInfoDTO createObservation1() {
 		ObservationInfoDTO observation = new ObservationInfoDTO();
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setInstrumentIRI(null);
 		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric");
-		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
 		observation.setScaleIRI("https://purl.org/oquo#NamesPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
-		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Integer.valueOf(1));
 		return observation;
 	}
-	
+
 	private ObservationInfoDTO createObservation2() {
 		ObservationInfoDTO observation = new ObservationInfoDTO();
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setInstrumentIRI(null);
 		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
-		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
 		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
-		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Integer.valueOf(1));
 		return observation;
 	}
-	
+
 	private ObservationInfoDTO createObservation3() {
 		ObservationInfoDTO observation = new ObservationInfoDTO();
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
-		observation.setInstrumentIRI(null);
 		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
-		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
 		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
-		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Double.valueOf(0.85));
 		return observation;
 	}
-	
+
 	private ObservationInfoDTO createObservation4() {
 		ObservationInfoDTO observation = new ObservationInfoDTO();
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
-		observation.setInstrumentIRI(null);
 		observation.setMetricUsedIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetric");
-		observation.setObservablePropertyIRI(null);
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#LowerBest");
 		observation.setScaleIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
-		observation.setUnitOfMeasureIRI(null);
 		observation.setValue(Double.valueOf(5));
 		return observation;
 	}
