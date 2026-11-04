@@ -19,6 +19,8 @@ import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
 class RDFValidatorTest {
 
+	private static final String OQUO_HURON_IRI = "https://purl.org/oquo-huron";
+
 	@Test
 	void testValidate1() {
 		Model model = ModelFactory.createDefaultModel();
@@ -29,7 +31,7 @@ class RDFValidatorTest {
 		InstanceCreator.createObservation(model, createObservation3());
 		assertFalse(model.isEmpty());
 
-		ValidationReport report = RDFValidator.validate(model);
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
 		ShLib.printReport(report);
 		assertTrue(report.conforms());
 	}
@@ -38,7 +40,7 @@ class RDFValidatorTest {
 	void testValidate2() {
 		Model model = this.generateNonCompliantModel();
 
-		ValidationReport report = RDFValidator.validate(model);
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
 		assertFalse(report.conforms());
 		//ShLib.printReport(report);
 
@@ -50,9 +52,9 @@ class RDFValidatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#NamesPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#NamesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#NamesPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Integer.valueOf(1));
@@ -64,9 +66,9 @@ class RDFValidatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Integer.valueOf(1));
@@ -78,9 +80,9 @@ class RDFValidatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Double.valueOf(0.85));

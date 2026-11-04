@@ -19,14 +19,13 @@ import es.um.dis.tecnomod.oquo.dto.ObservationsInfoDTO;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
 public class InstanceCreator {
+	private static final String OQUO_INSTANCES_DEFAULT_NS = "https://purl.org/oquo-data/";
 
 	/* Quality model and evaluation result entities */
 	private static final String HAS_RANKIG_FUNCTION = Namespaces.QM_NS + "hasRankigFunction";
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
 	private static final String IS_MEASURED_ON_SCALE = Namespaces.RES_NS + "isMeasuredOnScale";
 	private static final String FOR_MEASURE = Namespaces.RES_NS + "forMeasure";
-	// private static final String QUALITY_MEASURE = Namespaces.QM_NS +
-	// "QualityMeasure";
 	private static final String PRODUCED_QUALITY_VALUE = Namespaces.RES_NS + "producedQualityValue";
 	private static final String OBTAINED_FROM = Namespaces.RES_NS + "obtainedFrom";
 	private static final String HAS_LITERAL_VALUE = Namespaces.RES_NS + "hasLiteralValue";
@@ -73,15 +72,27 @@ public class InstanceCreator {
 	/* Time ontology */
 	private static final String HAS_TIME = Namespaces.TIME_NS + "hasTime";
 
+	private static String resolveDataNamespace(String ns) {
+	    return (ns == null || ns.trim().isEmpty()) ? OQUO_INSTANCES_DEFAULT_NS : ns;
+	}
+
+	public static Model createObservations(ObservationsInfoDTO observationsInfo) {
+		return createObservations(observationsInfo, OQUO_INSTANCES_DEFAULT_NS);
+	}
+
+	public static void createObservation(Model rdfModel, ObservationInfoDTO observationInfo) {
+		createObservation(rdfModel, observationInfo, OQUO_INSTANCES_DEFAULT_NS);
+	}
+
 	/**
 	 * Create an RDF model with from a list of observation info dto.
 	 * @param observationsInfo The observations
 	 * @return An RDF model
 	 */
-	public static Model createObservations(ObservationsInfoDTO observationsInfo) {
+	public static Model createObservations(ObservationsInfoDTO observationsInfo, String oquoDataNamespace) {
 		Model rdfModel = ModelFactory.createDefaultModel();
 		for (ObservationInfoDTO observationInfo : observationsInfo.getObservationsInfoDTO()) {
-			createObservation(rdfModel, observationInfo);
+			createObservation(rdfModel, observationInfo, resolveDataNamespace(oquoDataNamespace));
 		}
 		return rdfModel;
 	}
@@ -95,7 +106,7 @@ public class InstanceCreator {
 	 * @param observationInfo The information about the observation.
 	 * @see http://vocab.linkeddata.es/eval/index.html
 	 */
-	public static void createObservation(Model rdfModel, ObservationInfoDTO observationInfo) {
+	public static void createObservation(Model rdfModel, ObservationInfoDTO observationInfo, String oquoDataNamespace) {
 		String featureOfInterestIRI = observationInfo.getFeatureOfInterestIRI();
 		String featureOfInterestTypeIRI = observationInfo.getFeatureOfInterestTypeIRI();
 		String sourceDocumentIRI = observationInfo.getSourceDocumentIRI();
@@ -107,10 +118,11 @@ public class InstanceCreator {
 		Object value = observationInfo.getValue();
 		Calendar timestamp = observationInfo.getTimestamp();
 
+		String resolvedOquoDataNamespace = resolveDataNamespace(oquoDataNamespace);
 		/* Evaluation result triples */
 
 		/* Evaluation and evaluationSubject */
-		String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + UUID.randomUUID().toString();
+		String evaluationIRI = resolvedOquoDataNamespace + "evaluation-" + UUID.randomUUID().toString();
 		Resource evaluationSubject = rdfModel.createResource(featureOfInterestIRI,
 				rdfModel.createResource(EVALUATION_SUBJECT));
 		Resource evaluation = rdfModel.createResource(evaluationIRI, rdfModel.createResource(EVALUATION));
@@ -120,7 +132,7 @@ public class InstanceCreator {
 		rdfModel.add(evaluationSubject, RDF.type, featureOfInterestType);
 
 		/* Instant */
-		String instantIRI = Namespaces.OQUO_NS + "instant-" + UUID.randomUUID().toString();
+		String instantIRI = resolvedOquoDataNamespace + "instant-" + UUID.randomUUID().toString();
 		Resource instant = rdfModel.createResource(instantIRI, rdfModel.createResource(INSTANT));
 		Property inXSDDateTime = rdfModel.createProperty(IN_XSD_DATE_TIME);
 		rdfModel.add(instant, inXSDDateTime, rdfModel.createTypedLiteral(timestamp));
@@ -160,7 +172,7 @@ public class InstanceCreator {
 		}
 
 		/* Quality value */
-		String qualityValueIRI = Namespaces.OQUO_NS + "qualityValue-" + UUID.randomUUID().toString();
+		String qualityValueIRI = resolvedOquoDataNamespace + "qualityValue-" + UUID.randomUUID().toString();
 		Resource qualityValue = rdfModel.createResource(qualityValueIRI, rdfModel.createResource(QUALITY_VALUE));
 		Property hasLiteralValue = rdfModel.createProperty(HAS_LITERAL_VALUE);
 		rdfModel.add(qualityValue, hasLiteralValue, rdfModel.createTypedLiteral(value));
@@ -179,7 +191,7 @@ public class InstanceCreator {
 		rdfModel.add(evaluation, producedQualityValue, qualityValue);
 
 		/* Quality value and quality measure */
-		String qualityMeasureIRI = Namespaces.OQUO_NS + "metric-" + UUID.randomUUID().toString();
+		String qualityMeasureIRI = resolvedOquoDataNamespace + "metric-" + UUID.randomUUID().toString();
 		Resource qualityMeasure = rdfModel.createResource(qualityMeasureIRI, rdfModel.createResource(metricUsedIRI));
 		Property forMeasure = rdfModel.createProperty(FOR_MEASURE);
 		rdfModel.add(qualityValue, forMeasure, qualityMeasure);
@@ -211,7 +223,7 @@ public class InstanceCreator {
 		rdfModel.add(qualityValue, RDF.type, rdfModel.createResource(MEASUREMENT_VALUE));
 
 		/* Observation */
-		String observationIRI = Namespaces.OQUO_NS + "observation-" + UUID.randomUUID().toString();
+		String observationIRI = resolvedOquoDataNamespace + "observation-" + UUID.randomUUID().toString();
 		Resource observation = rdfModel.createResource(observationIRI, rdfModel.createResource(OBSERVATION));
 		rdfModel.add(observation, rdfModel.createProperty(OF_ENTITY), evaluationSubject);
 		rdfModel.add(evaluation, rdfModel.createProperty(HAS_OBSERVATION), observation);
@@ -232,13 +244,15 @@ public class InstanceCreator {
 				Resource hostAsset = rdfModel.createResource(issueInfoDTO.getHostAsset(),
 						rdfModel.createResource(ASSET));
 				/* Issue */
-				String issueIRI = Namespaces.OQUO_NS + "issue-" + UUID.randomUUID().toString();
+				String issueIRI = resolvedOquoDataNamespace + "issue-" + UUID.randomUUID().toString();
 				String message = issueInfoDTO.getMessage();
 				Resource issue = rdfModel.createResource(issueIRI,
 						rdfModel.createResource(issueInfoDTO.getIssueType()));
 
 				/* Issue rdfs:comment message */
-				rdfModel.add(issue, RDFS.comment, message);
+				if (message != null && !message.trim().isEmpty()) {
+					rdfModel.add(issue, RDFS.comment, message);
+				}
 
 				/* Issue hasHostAsset Asset */
 				rdfModel.add(issue, rdfModel.createProperty(HAS_HOST_ASSET), hostAsset);
@@ -271,6 +285,7 @@ public class InstanceCreator {
 
 	}
 
+
 	/**
 	 * Generates the IRI for an evaluation instance. This IRI depends on the feature
 	 * of interest and the ontology version IRI
@@ -278,11 +293,15 @@ public class InstanceCreator {
 	 * @param observationInfo The observation info dto object.
 	 * @return The IRI to use for the evaluation instance.
 	 */
-	public static String getEvaluationIRI(ObservationInfoDTO observationInfo) {
+	public static String getEvaluationIRI(ObservationInfoDTO observationInfo, String oquoDataNamespace) {
 		String str = observationInfo.getFeatureOfInterestIRI() + observationInfo.getSourceDocumentIRI();
 		UUID id = UUID.nameUUIDFromBytes(str.getBytes());
-		String evaluationIRI = Namespaces.OQUO_NS + "evaluation-" + id.toString();
+		String evaluationIRI = resolveDataNamespace(oquoDataNamespace) + "evaluation-" + id.toString();
 		return evaluationIRI;
+	}
+
+	public static String getEvaluationIRI(ObservationInfoDTO observationInfo) {
+	    return getEvaluationIRI(observationInfo, OQUO_INSTANCES_DEFAULT_NS);
 	}
 
 }

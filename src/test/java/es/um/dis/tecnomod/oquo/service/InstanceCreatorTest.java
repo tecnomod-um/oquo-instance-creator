@@ -26,6 +26,9 @@ import es.um.dis.tecnomod.oquo.utils.Namespaces;
 
 class InstanceCreatorTest {
 
+	private static final String OQUO_OQUARE_IRI = "https://purl.org/oquo-oquare";
+	private static final String OQUO_HURON_IRI = "https://purl.org/oquo-huron";
+
 	@Test
 	void testCreateObservation() {
 		// Create jena model to store the rdf
@@ -153,7 +156,7 @@ class InstanceCreatorTest {
 		assertFalse(model.isEmpty());
 
 		// Optionally you can check if the rdf data conforms the ontology
-		ValidationReport report = RDFValidator.validate(model);
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
 		ShLib.printReport(report);  // Print report with detected violations.
 		assertFalse(report.conforms());
 
@@ -181,8 +184,8 @@ class InstanceCreatorTest {
 		InstanceCreator.createObservation(model, observation3);
 		assertFalse(model.isEmpty());
 
-		ValidationReport report = RDFValidator.validate(model);
-		//ShLib.printReport(report);
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
+		ShLib.printReport(report);
 		assertTrue(report.conforms());
 
 		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
@@ -202,7 +205,7 @@ class InstanceCreatorTest {
 		InstanceCreator.createObservation(model, observation4);
 		assertFalse(model.isEmpty());
 
-		ValidationReport report = RDFValidator.validate(model);
+		ValidationReport report = RDFValidator.validate(model, OQUO_OQUARE_IRI);
 		//ShLib.printReport(report);
 		assertTrue(report.conforms());
 
@@ -227,9 +230,9 @@ class InstanceCreatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#NamesPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#NamesPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#NamesPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#NamesPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Integer.valueOf(1));
@@ -241,9 +244,9 @@ class InstanceCreatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/GO_0008150");
 		observation.setFeatureOfInterestTypeIRI(OWL.Class.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Integer.valueOf(1));
@@ -255,9 +258,9 @@ class InstanceCreatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#DescriptionsPerClassMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
-		observation.setScaleIRI("https://purl.org/oquo#DescriptionsPerClassMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Double.valueOf(0.85));
@@ -269,9 +272,9 @@ class InstanceCreatorTest {
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
 		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
-		observation.setMetricUsedIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetric");
+		observation.setMetricUsedIRI("https://purl.org/oquo-oquare#LackOfCohesionInMethodsMetric");
 		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#LowerBest");
-		observation.setScaleIRI("https://purl.org/oquo#LackOfCohesionInMethodsMetricScale");
+		observation.setScaleIRI("https://purl.org/oquo-oquare#LackOfCohesionInMethodsMetricScale");
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Double.valueOf(5));
