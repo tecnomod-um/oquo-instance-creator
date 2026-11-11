@@ -225,6 +225,72 @@ class InstanceCreatorTest {
 		assertNotEquals(InstanceCreator.getEvaluationIRI(observation1), InstanceCreator.getEvaluationIRI(observation3));
 	}
 
+	@Test
+	void testAgent1() {
+		Model model = ModelFactory.createDefaultModel();
+		assertTrue(model.isEmpty());
+
+		ObservationInfoDTO observation = createObservation5();
+
+		InstanceCreator.createObservation(model, observation);
+		assertFalse(model.isEmpty());
+
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
+		//ShLib.printReport(report);
+		assertTrue(report.conforms());
+
+		Resource agentClass = model.createResource(Namespaces.PROV_NS + "Agent");
+		assertEquals(1, model.listSubjectsWithProperty(RDF.type, agentClass).toList().size());
+//		model.setNsPrefixes(Namespaces.getPrefixMap());
+//		model.write(System.out, "TURTLE");
+	}
+
+	@Test
+	void testAgent2() {
+		Model model = ModelFactory.createDefaultModel();
+		assertTrue(model.isEmpty());
+
+		ObservationInfoDTO observation = createObservation6();
+
+		InstanceCreator.createObservation(model, observation);
+		assertFalse(model.isEmpty());
+
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
+		//ShLib.printReport(report);
+		assertTrue(report.conforms());
+
+		Resource agentClass = model.createResource(Namespaces.PROV_NS + "Agent");
+		assertEquals(0, model.listSubjectsWithProperty(RDF.type, agentClass).toList().size());
+		Resource softwareAgentClass = model.createResource(Namespaces.PROV_NS + "SoftwareAgent");
+		assertEquals(1, model.listSubjectsWithProperty(RDF.type, softwareAgentClass).toList().size());
+//		model.setNsPrefixes(Namespaces.getPrefixMap());
+//		model.write(System.out, "TURTLE");
+	}
+
+	@Test
+	void testAgent3() {
+		Model model = ModelFactory.createDefaultModel();
+		assertTrue(model.isEmpty());
+
+		ObservationInfoDTO observation = createObservation7();
+
+		InstanceCreator.createObservation(model, observation);
+		assertFalse(model.isEmpty());
+
+		ValidationReport report = RDFValidator.validate(model, OQUO_HURON_IRI);
+		//ShLib.printReport(report);
+		assertTrue(report.conforms());
+
+		Resource agentClass = model.createResource(Namespaces.PROV_NS + "Agent");
+		assertEquals(0, model.listSubjectsWithProperty(RDF.type, agentClass).toList().size());
+		Resource softwareAgentClass = model.createResource(Namespaces.PROV_NS + "SoftwareAgent");
+		assertEquals(1, model.listSubjectsWithProperty(RDF.type, softwareAgentClass).toList().size());
+
+		assertEquals(1, model.listSubjectsWithProperty(model.createProperty(Namespaces.TERMS_NS  + "isVersionOf"), model.createResource("https://purl.org/oquo-huron#huron-framework")).toList().size());
+//		model.setNsPrefixes(Namespaces.getPrefixMap());
+//		model.write(System.out, "TURTLE");
+	}
+
 	private ObservationInfoDTO createObservation1() {
 		ObservationInfoDTO observation = new ObservationInfoDTO();
 		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
@@ -278,6 +344,54 @@ class InstanceCreatorTest {
 		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
 		observation.setTimestamp(Calendar.getInstance());
 		observation.setValue(Double.valueOf(5));
+		return observation;
+	}
+
+	private ObservationInfoDTO createObservation5() {
+		ObservationInfoDTO observation = new ObservationInfoDTO();
+		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
+		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
+		observation.setTimestamp(Calendar.getInstance());
+		observation.setValue(Double.valueOf(0.85));
+		observation.setAgentIRI("https://purl.org/oquo-huron#huron-framework");
+		return observation;
+	}
+
+	private ObservationInfoDTO createObservation6() {
+		ObservationInfoDTO observation = new ObservationInfoDTO();
+		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
+		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
+		observation.setTimestamp(Calendar.getInstance());
+		observation.setValue(Double.valueOf(0.85));
+		observation.setAgentIRI("https://purl.org/oquo-huron#huron-framework");
+		observation.setAgentTypeIRI("http://www.w3.org/ns/prov#SoftwareAgent");
+		return observation;
+	}
+
+	private ObservationInfoDTO createObservation7() {
+		ObservationInfoDTO observation = new ObservationInfoDTO();
+		observation.setSourceDocumentIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestIRI("http://purl.obolibrary.org/obo/go/releases/2021-02-01/go.owl");
+		observation.setFeatureOfInterestTypeIRI(OWL.Ontology.getURI());
+		observation.setMetricUsedIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetric");
+		observation.setRankingFunctionIRI("http://purl.org/net/QualityModel#HigherBest");
+		observation.setScaleIRI("https://purl.org/oquo-huron#DescriptionsPerClassMetricScale");
+		observation.setScaleTypeIRI("https://purl.org/oquo#RawScale");
+		observation.setTimestamp(Calendar.getInstance());
+		observation.setValue(Double.valueOf(0.85));
+		observation.setAgentIRI("https://purl.org/oquo-huron#huron-framework");
+		observation.setAgentTypeIRI("http://www.w3.org/ns/prov#SoftwareAgent");
+		observation.setAgentVersion("1.2");
 		return observation;
 	}
 

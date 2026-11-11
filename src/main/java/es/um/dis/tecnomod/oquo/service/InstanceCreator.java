@@ -1,5 +1,6 @@
 package es.um.dis.tecnomod.oquo.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -60,11 +61,27 @@ public class InstanceCreator {
 	private static final String INDICATES = Namespaces.IPO_NS + "indicates";
 	private static final String INDICATED_BY = Namespaces.IPO_NS + "indicatedBy";
 
+	/* PROV entities */
+	private static final String PROV_ACTIVITY = Namespaces.PROV_NS + "Activity";
+	private static final String PROV_AGENT = Namespaces.PROV_NS + "Agent";
+	private static final String PROV_ENTITY = Namespaces.PROV_NS + "Entity";
+
+	private static final String PROV_GENERATED = Namespaces.PROV_NS + "generated";
+	private static final String PROV_WAS_GENERATED_BY = Namespaces.PROV_NS + "wasGeneratedBy";
+	private static final String PROV_WAS_ATTRIBUTED_TO = Namespaces.PROV_NS + "wasAttributedTo";
+	private static final String PROV_WAS_ASSOCIATED_WITH = Namespaces.PROV_NS + "wasAssociatedWith";
+
 	/* OQUO entities */
 	private static final String HAS_DETECTED_ISSUE = Namespaces.OQUO_NS + "hasDetectedIssue";
 	private static final String EVALUATION_INPUT_DATA = Namespaces.OQUO_NS + "EvaluationInputData";
 	private static final String EVALUATION_CONFIGURATION_DATA = Namespaces.OQUO_NS + "EvaluationConfigurationData";
 	private static final String HAS_OBSERVATION = Namespaces.OQUO_NS + "hasObservation";
+
+	/* SCHEMA */
+	private static final String SCHEMA_SOFTWARE_VERSION_IRI = Namespaces.SCHEMA_NS + "softwareVersion";
+
+	/* TERMS */
+	private static final String TERMS_IS_VERSION_OF_IRI = Namespaces.TERMS_NS  + "isVersionOf";
 
 	/* Commons Text Datatype Ontology entities */
 	private static final String HAS_TEXT_VALUE = Namespaces.CMNSTXT_NS + "hasTextValue";
@@ -283,8 +300,42 @@ public class InstanceCreator {
 			}
 		}
 
+		/* PROV triples */
+		rdfModel.add(evaluation, RDF.type, rdfModel.createResource(PROV_ACTIVITY));
+		rdfModel.add(qualityValue, RDF.type, rdfModel.createResource(PROV_ENTITY));
+
+		rdfModel.add(evaluation, rdfModel.createProperty(PROV_GENERATED), qualityValue);
+		rdfModel.add(qualityValue, rdfModel.createProperty(PROV_WAS_GENERATED_BY), evaluation);
+
+		if(observationInfo.getAgentIRI() != null && !observationInfo.getAgentIRI().trim().isEmpty()) {
+			Resource agentResource = getAgentResource(rdfModel, observationInfo.getAgentIRI(), observationInfo.getAgentVersion(), observationInfo.getAgentTypeIRI(), resolvedOquoDataNamespace);
+
+			rdfModel.add(evaluation, rdfModel.createProperty(PROV_WAS_ASSOCIATED_WITH), agentResource);
+			rdfModel.add(qualityValue, rdfModel.createProperty(PROV_WAS_ATTRIBUTED_TO), agentResource);
+		}
 	}
 
+
+	private static Resource getAgentResource(Model rdfModel, String agentIRI, String agentVersion, String agentTypeIRI, String namespace) {
+		Resource agentResource = null;
+		if (agentVersion == null || agentVersion.trim().isEmpty()) {
+			agentResource = rdfModel.createResource(agentIRI);
+		} else {
+			String key = agentIRI + "|" + agentVersion;
+			String agentResolvedIRI = namespace + "agent-" + UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8));
+			agentResource = rdfModel.createResource(agentResolvedIRI);
+			rdfModel.add(agentResource, rdfModel.createProperty(SCHEMA_SOFTWARE_VERSION_IRI), agentVersion);
+			rdfModel.add(agentResource, rdfModel.createProperty(TERMS_IS_VERSION_OF_IRI), rdfModel.createResource(agentIRI));
+		}
+
+		if (agentTypeIRI != null && !agentTypeIRI.trim().isEmpty()) {
+			rdfModel.add(agentResource, RDF.type, rdfModel.createResource(agentTypeIRI));
+		} else {
+			rdfModel.add(agentResource, RDF.type, rdfModel.createResource(PROV_AGENT));
+		}
+
+		return agentResource;
+	}
 
 	/**
 	 * Generates the IRI for an evaluation instance. This IRI depends on the feature

@@ -17,7 +17,9 @@ public class Namespaces {
 	public static final String OWL_NS = "http://www.w3.org/2002/07/owl#";
 	public static final String IPO_NS = "http://purl.org/ipo/core#";
 	public static final String CMNSTXT_NS = "https://www.omg.org/spec/Commons/TextDatatype/";
-	
+	public static final String SCHEMA_NS = "http://schema.org/";
+	public static final String TERMS_NS = "http://purl.org/dc/terms/";
+
 	public static Map<String, String> getPrefixMap() {
 		Map<String, String> prefixMap = new HashMap<>();
 		for (Field field : Namespaces.class.getDeclaredFields()) {
