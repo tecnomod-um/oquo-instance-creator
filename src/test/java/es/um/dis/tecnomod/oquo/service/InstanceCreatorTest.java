@@ -188,7 +188,7 @@ class InstanceCreatorTest {
 		ShLib.printReport(report);
 		assertTrue(report.conforms());
 
-		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
+		Resource evaluationClass = model.createResource(Namespaces.EVAL_NS + "Evaluation");
 		assertEquals(3, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 //		model.setNsPrefixes(Namespaces.getPrefixMap());
 //		model.write(System.out, "TURTLE");
@@ -209,7 +209,7 @@ class InstanceCreatorTest {
 		//ShLib.printReport(report);
 		assertTrue(report.conforms());
 
-		Resource evaluationClass = model.createResource(Namespaces.RES_NS + "Evaluation");
+		Resource evaluationClass = model.createResource(Namespaces.EVAL_NS + "Evaluation");
 		assertEquals(1, model.listSubjectsWithProperty(RDF.type, evaluationClass).toList().size());
 		model.setNsPrefixes(Namespaces.getPrefixMap());
 		model.write(System.out, "TURTLE");

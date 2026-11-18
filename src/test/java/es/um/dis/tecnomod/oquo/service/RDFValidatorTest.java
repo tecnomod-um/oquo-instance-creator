@@ -91,10 +91,10 @@ class RDFValidatorTest {
 
 	private Model generateNonCompliantModel() {
 		Model model = ModelFactory.createDefaultModel();
-		Resource evaluation = model.createResource(Namespaces.OQUO_NS + "evaluationIns", model.createResource(Namespaces.RES_NS + "Evaluation"));
-		Property evaluatedSubject = model.createProperty(Namespaces.RES_NS + "evaluatedSubject");
+		Resource evaluation = model.createResource(Namespaces.OQUO_NS + "evaluationIns", model.createResource(Namespaces.EVAL_NS + "Evaluation"));
+		Property evaluatedSubject = model.createProperty(Namespaces.EVAL_NS + "evaluatedSubject");
 		Resource evaluationSubject = model.createResource("http://purl.obolibrary.org/obo/GO_0008150",
-				model.createResource(Namespaces.RES_NS + "EvaluationSubject"));
+				model.createResource(Namespaces.EVAL_NS + "EvaluationSubject"));
 		model.add(evaluation, evaluatedSubject, evaluationSubject);
 
 		return model;

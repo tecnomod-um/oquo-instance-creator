@@ -8,7 +8,7 @@ public class Namespaces {
 	public static final String OQUO_NS = "https://purl.org/oquo#";
 	public static final String PROV_NS = "http://www.w3.org/ns/prov#";
 	public static final String QM_NS = "http://purl.org/net/QualityModel#";
-	public static final String RES_NS = "http://purl.org/net/EvaluationResult#";
+	public static final String EVAL_NS = "http://purl.org/net/EvaluationResult#";
 	public static final String TIME_NS = "http://www.w3.org/2006/time#";
 	public static final String OBOE_NS = "http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#";
 	public static final String BTL2_NS = "http://purl.org/biotop/btl2.owl#";
@@ -19,6 +19,7 @@ public class Namespaces {
 	public static final String CMNSTXT_NS = "https://www.omg.org/spec/Commons/TextDatatype/";
 	public static final String SCHEMA_NS = "http://schema.org/";
 	public static final String TERMS_NS = "http://purl.org/dc/terms/";
+	public static final String OBO_NS = "http://purl.obolibrary.org/obo/";
 
 	public static Map<String, String> getPrefixMap() {
 		Map<String, String> prefixMap = new HashMap<>();

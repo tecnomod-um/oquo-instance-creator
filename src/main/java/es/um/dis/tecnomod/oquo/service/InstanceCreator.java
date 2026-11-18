@@ -17,27 +17,32 @@ import es.um.dis.tecnomod.oquo.dto.ConfigurationInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.IssueInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.ObservationInfoDTO;
 import es.um.dis.tecnomod.oquo.dto.ObservationsInfoDTO;
+import es.um.dis.tecnomod.oquo.utils.JenaUtils;
 import es.um.dis.tecnomod.oquo.utils.Namespaces;
+import es.um.dis.tecnomod.oquo.utils.ScaleConversionJenaUtils;
 
 public class InstanceCreator {
+
+
+
 	private static final String OQUO_INSTANCES_DEFAULT_NS = "https://purl.org/oquo-data/";
 
 	/* Quality model and evaluation result entities */
 	private static final String HAS_RANKIG_FUNCTION = Namespaces.QM_NS + "hasRankigFunction";
 	private static final String RANKING_FUNCTION = Namespaces.QM_NS + "RankingFunction";
-	private static final String IS_MEASURED_ON_SCALE = Namespaces.RES_NS + "isMeasuredOnScale";
-	private static final String FOR_MEASURE = Namespaces.RES_NS + "forMeasure";
-	private static final String PRODUCED_QUALITY_VALUE = Namespaces.RES_NS + "producedQualityValue";
-	private static final String OBTAINED_FROM = Namespaces.RES_NS + "obtainedFrom";
-	private static final String HAS_LITERAL_VALUE = Namespaces.RES_NS + "hasLiteralValue";
-	private static final String QUALITY_VALUE = Namespaces.RES_NS + "QualityValue";
-	private static final String INPUT_DATA = Namespaces.RES_NS + "inputData";
-	private static final String EVALUATION_DATA = Namespaces.RES_NS + "EvaluationData";
+	private static final String IS_MEASURED_ON_SCALE = Namespaces.EVAL_NS + "isMeasuredOnScale";
+	private static final String FOR_MEASURE = Namespaces.EVAL_NS + "forMeasure";
+	private static final String PRODUCED_QUALITY_VALUE = Namespaces.EVAL_NS + "producedQualityValue";
+	private static final String OBTAINED_FROM = Namespaces.EVAL_NS + "obtainedFrom";
+	private static final String HAS_LITERAL_VALUE = Namespaces.EVAL_NS + "hasLiteralValue";
+	private static final String QUALITY_VALUE = Namespaces.EVAL_NS + "QualityValue";
+	private static final String INPUT_DATA = Namespaces.EVAL_NS + "inputData";
+	private static final String EVALUATION_DATA = Namespaces.EVAL_NS + "EvaluationData";
 	private static final String IN_XSD_DATE_TIME = Namespaces.TIME_NS + "inXSDDateTime";
 	private static final String INSTANT = Namespaces.TIME_NS + "Instant";
-	private static final String EVALUATED_SUBJECT = Namespaces.RES_NS + "evaluatedSubject";
-	private static final String EVALUATION = Namespaces.RES_NS + "Evaluation";
-	private static final String EVALUATION_SUBJECT = Namespaces.RES_NS + "EvaluationSubject";
+	private static final String EVALUATED_SUBJECT = Namespaces.EVAL_NS + "evaluatedSubject";
+	private static final String EVALUATION = Namespaces.EVAL_NS + "Evaluation";
+	private static final String EVALUATION_SUBJECT = Namespaces.EVAL_NS + "EvaluationSubject";
 
 	/* OBOE entities */
 	private static final String ENTITY = Namespaces.OBOE_NS + "Entity";
@@ -76,6 +81,7 @@ public class InstanceCreator {
 	private static final String EVALUATION_INPUT_DATA = Namespaces.OQUO_NS + "EvaluationInputData";
 	private static final String EVALUATION_CONFIGURATION_DATA = Namespaces.OQUO_NS + "EvaluationConfigurationData";
 	private static final String HAS_OBSERVATION = Namespaces.OQUO_NS + "hasObservation";
+	private static final String HAS_INPUT_SCALE = Namespaces.OQUO_NS + "hasInputScale";
 
 	/* SCHEMA */
 	private static final String SCHEMA_SOFTWARE_VERSION_IRI = Namespaces.SCHEMA_NS + "softwareVersion";
@@ -89,6 +95,8 @@ public class InstanceCreator {
 	/* Time ontology */
 	private static final String HAS_TIME = Namespaces.TIME_NS + "hasTime";
 
+
+
 	private static String resolveDataNamespace(String ns) {
 	    return (ns == null || ns.trim().isEmpty()) ? OQUO_INSTANCES_DEFAULT_NS : ns;
 	}
@@ -100,6 +108,38 @@ public class InstanceCreator {
 	public static void createObservation(Model rdfModel, ObservationInfoDTO observationInfo) {
 		createObservation(rdfModel, observationInfo, OQUO_INSTANCES_DEFAULT_NS);
 	}
+
+	/**
+	 * Create the observations defined in observationsInfo and apply the model located at modelIRI
+	 * @param observationsInfo
+	 * @param modelIRI
+	 * @param oquoDataNamespace
+	 * @return an RDF model
+	 */
+	public static Model createObservationsAndApplyModel(ObservationsInfoDTO observationsInfo, String ontologyIRI, String oquoDataNamespace) {
+		Model rdfModel = createObservations(observationsInfo, oquoDataNamespace);
+		applyModel(rdfModel, ontologyIRI, oquoDataNamespace);
+		return rdfModel;
+	}
+
+	public static void applyModel(Model rdfModel, String ontologyIRI, String oquoDataNamespace) {
+		Model ontology = JenaUtils.readOntologyWithImports(ontologyIRI);
+		rdfModel.add(ontology);
+
+		List<Resource> qualityValues = rdfModel.listResourcesWithProperty(RDF.type, rdfModel.getResource(QUALITY_VALUE)).toList();
+		for (Resource qualityValue : qualityValues) {
+			Resource qualityValueScale = qualityValue.getPropertyResourceValue(rdfModel.getProperty(IS_MEASURED_ON_SCALE));
+			if (qualityValueScale == null) {
+				continue;
+			}
+			List<Resource> applicableScaleConversions = rdfModel.listResourcesWithProperty(rdfModel.getProperty(HAS_INPUT_SCALE), qualityValueScale).toList();
+			for(Resource scaleConversion : applicableScaleConversions) {
+				ScaleConversionJenaUtils.applyScaleConversion(rdfModel, qualityValue, scaleConversion, oquoDataNamespace);
+			}
+		}
+	}
+
+
 
 	/**
 	 * Create an RDF model with from a list of observation info dto.
