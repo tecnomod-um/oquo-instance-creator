@@ -8,7 +8,9 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.atlas.web.TypedInputStream;
@@ -30,6 +32,23 @@ public class JenaUtils {
     private static final List<Lang> SYNTAXES = Arrays.asList(
             Lang.RDFXML, Lang.TURTLE, Lang.JSONLD, Lang.NTRIPLES,
             Lang.TRIG, Lang.NQUADS, Lang.RDFJSON, Lang.TRIX);
+
+	/** Documents already read, by location. */
+	private static final Map<String, Model> CACHE = new ConcurrentHashMap<>();
+
+	/**
+	 * Reads the RDF document at location, as readModel, but only the first time: later calls
+	 * return a copy of the model read then.
+	 */
+	public static Model readModelCached(String location) {
+		Model cached = CACHE.computeIfAbsent(location, JenaUtils::readModel);
+		return ModelFactory.createDefaultModel().add(cached);
+	}
+
+	/** Empties the cache, so that the documents are read again (e.g. after publishing a new version). */
+	public static void clearCache() {
+		CACHE.clear();
+	}
 
     /**
      * Reads the RDF document at location (a URL, a file: IRI or a local path), trying every
@@ -90,7 +109,7 @@ public class JenaUtils {
 	        if (!visited.add(iri)) {
 	            continue;
 	        }
-	        Model ontology = readModel(iri);
+	        Model ontology = readModelCached(iri);
 	        ontology.listObjectsOfProperty(OWL.imports)
 	                .mapWith(RDFNode::asResource)
 	                .forEachRemaining(imported -> pending.push(imported.getURI()));

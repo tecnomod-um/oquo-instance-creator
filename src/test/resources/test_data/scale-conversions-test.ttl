@@ -1,0 +1,175 @@
+# Test ontology for the scale conversions of oquo-instance-creator.
+#
+# It defines one input scale per type of scale conversion, with a conversion to an output scale,
+# so that the nine types can be tested without network access. It does not import the OQUO core:
+# the conversion code only needs these triples.
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix om:   <http://www.wurvoc.org/vocabularies/om-1.8/> .
+@prefix qm:   <http://purl.org/net/QualityModel#> .
+@prefix oquo: <https://purl.org/oquo#> .
+@prefix ex:   <https://example.org/oquo-conversions-test#> .
+
+<https://example.org/oquo-conversions-test> a owl:Ontology .
+
+# ---------------------------------------------------------------------------
+# Output scales
+# ---------------------------------------------------------------------------
+
+ex:PercentageScale a om:Ratio_scale ;
+    qm:hasRankigFunction qm:HigherBest ;
+    rdfs:label "percentage scale" .
+
+ex:FiveScale a om:Ordinal_scale ;
+    qm:hasRankigFunction qm:HigherBest ;
+    om:element ex:Five1 , ex:Five2 , ex:Five3 , ex:Five4 , ex:Five5 ;
+    rdfs:label "five categories scale" .
+ex:Five1 a om:Ordered_measurement_scale_category ; om:rank 1 ; rdfs:label "five 1" .
+ex:Five2 a om:Ordered_measurement_scale_category ; om:rank 2 ; rdfs:label "five 2" .
+ex:Five3 a om:Ordered_measurement_scale_category ; om:rank 3 ; rdfs:label "five 3" .
+ex:Five4 a om:Ordered_measurement_scale_category ; om:rank 4 ; rdfs:label "five 4" .
+ex:Five5 a om:Ordered_measurement_scale_category ; om:rank 5 ; rdfs:label "five 5" .
+
+ex:PassFailScale a om:Nominal_scale ;
+    om:element ex:Pass , ex:Fail ;
+    rdfs:label "pass/fail scale" .
+ex:Pass a om:Measurement_scale_category ; rdfs:label "pass" .
+ex:Fail a om:Measurement_scale_category ; rdfs:label "fail" .
+
+# ---------------------------------------------------------------------------
+# Input scales (the raw scales of the metrics)
+# ---------------------------------------------------------------------------
+
+# Cardinal, from 0 to INF
+ex:CardinalForCardinalScale a om:Ratio_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest .
+ex:CardinalForNominalScale  a om:Ratio_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest .
+
+# Ordinal, with three categories ranked 1 to 3
+ex:OrdinalForCardinalScale a om:Ordinal_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest ;
+    om:element ex:Low , ex:Medium , ex:High .
+ex:OrdinalForOrdinalScale  a om:Ordinal_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest ;
+    om:element ex:Low , ex:Medium , ex:High .
+ex:OrdinalForNominalScale  a om:Ordinal_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest ;
+    om:element ex:Low , ex:Medium , ex:High .
+ex:Low    a om:Ordered_measurement_scale_category ; om:rank 1 ; rdfs:label "low" .
+ex:Medium a om:Ordered_measurement_scale_category ; om:rank 2 ; rdfs:label "medium" .
+ex:High   a om:Ordered_measurement_scale_category ; om:rank 3 ; rdfs:label "high" .
+
+# Nominal, with two categories identified by their label
+ex:NominalForCardinalScale a om:Nominal_scale , oquo:RawScale ; om:element ex:Yes , ex:No .
+ex:NominalForOrdinalScale  a om:Nominal_scale , oquo:RawScale ; om:element ex:Yes , ex:No .
+ex:NominalForNominalScale  a om:Nominal_scale , oquo:RawScale ; om:element ex:Yes , ex:No .
+ex:Yes a om:Measurement_scale_category ; rdfs:label "yes" .
+ex:No  a om:Measurement_scale_category ; rdfs:label "no" .
+
+# ---------------------------------------------------------------------------
+# Cardinal to cardinal: [0, 1] -> 100 * x ; (1, INF) -> 100
+# ---------------------------------------------------------------------------
+
+ex:CardinalToCardinal a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:CardinalForCardinalScale ;
+    oquo:hasOutputScale ex:PercentageScale ;
+    oquo:hasScalePointMapping ex:CC1 , ex:CC2 .
+ex:CC1 a oquo:CardinalToCardinalScalePointMapping ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "1"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:ClosedIntervalBound ] ;
+    oquo:hasSlope "100"^^xsd:double ;
+    oquo:hasIntercept "0"^^xsd:double .
+ex:CC2 a oquo:CardinalToCardinalScalePointMapping ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "1"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:OpenIntervalBound ;
+        oquo:hasIntervalUpperValue "INF"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] ;
+    oquo:hasSlope "0"^^xsd:double ;
+    oquo:hasIntercept "100"^^xsd:double .
+
+# ---------------------------------------------------------------------------
+# Cardinal to nominal: [0, 0.5) -> fail ; [0.5, INF) -> pass
+# ---------------------------------------------------------------------------
+
+ex:CardinalToNominal a oquo:CardinalToNominalScaleConversion ;
+    oquo:hasInputScale ex:CardinalForNominalScale ;
+    oquo:hasOutputScale ex:PassFailScale ;
+    oquo:hasScalePointMapping ex:CN1 , ex:CN2 .
+ex:CN1 a oquo:CardinalToNominalScalePointMapping ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "0.5"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] ;
+    oquo:hasOutputScaleCategory ex:Fail .
+ex:CN2 a oquo:CardinalToNominalScalePointMapping ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0.5"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "INF"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] ;
+    oquo:hasOutputScaleCategory ex:Pass .
+
+# ---------------------------------------------------------------------------
+# Ordinal to cardinal: low -> 0 ; medium -> 50 ; high -> 100
+# ---------------------------------------------------------------------------
+
+ex:OrdinalToCardinal a oquo:OrdinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:OrdinalForCardinalScale ;
+    oquo:hasOutputScale ex:PercentageScale ;
+    oquo:hasScalePointMapping ex:OC1 , ex:OC2 , ex:OC3 .
+ex:OC1 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Low ;    oquo:hasOutputCardinalValue "0"^^xsd:double .
+ex:OC2 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Medium ; oquo:hasOutputCardinalValue "50"^^xsd:double .
+ex:OC3 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:High ;   oquo:hasOutputCardinalValue "100"^^xsd:double .
+
+# ---------------------------------------------------------------------------
+# Ordinal to ordinal: low -> 1 ; medium -> 3 ; high -> 5
+# ---------------------------------------------------------------------------
+
+ex:OrdinalToOrdinal a oquo:OrdinalToOrdinalScaleConversion ;
+    oquo:hasInputScale ex:OrdinalForOrdinalScale ;
+    oquo:hasOutputScale ex:FiveScale ;
+    oquo:hasScalePointMapping ex:OO1 , ex:OO2 , ex:OO3 .
+ex:OO1 a oquo:OrdinalToOrdinalScalePointMapping ; oquo:hasInputScaleCategory ex:Low ;    oquo:hasOutputScaleCategory ex:Five1 .
+ex:OO2 a oquo:OrdinalToOrdinalScalePointMapping ; oquo:hasInputScaleCategory ex:Medium ; oquo:hasOutputScaleCategory ex:Five3 .
+ex:OO3 a oquo:OrdinalToOrdinalScalePointMapping ; oquo:hasInputScaleCategory ex:High ;   oquo:hasOutputScaleCategory ex:Five5 .
+
+# ---------------------------------------------------------------------------
+# Ordinal to nominal: low -> fail ; medium, high -> pass
+# ---------------------------------------------------------------------------
+
+ex:OrdinalToNominal a oquo:OrdinalToNominalScaleConversion ;
+    oquo:hasInputScale ex:OrdinalForNominalScale ;
+    oquo:hasOutputScale ex:PassFailScale ;
+    oquo:hasScalePointMapping ex:ON1 , ex:ON2 , ex:ON3 .
+ex:ON1 a oquo:OrdinalToNominalScalePointMapping ; oquo:hasInputScaleCategory ex:Low ;    oquo:hasOutputScaleCategory ex:Fail .
+ex:ON2 a oquo:OrdinalToNominalScalePointMapping ; oquo:hasInputScaleCategory ex:Medium ; oquo:hasOutputScaleCategory ex:Pass .
+ex:ON3 a oquo:OrdinalToNominalScalePointMapping ; oquo:hasInputScaleCategory ex:High ;   oquo:hasOutputScaleCategory ex:Pass .
+
+# ---------------------------------------------------------------------------
+# Nominal to cardinal: no -> 0 ; yes -> 100
+# ---------------------------------------------------------------------------
+
+ex:NominalToCardinal a oquo:NominalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:NominalForCardinalScale ;
+    oquo:hasOutputScale ex:PercentageScale ;
+    oquo:hasScalePointMapping ex:NC1 , ex:NC2 .
+ex:NC1 a oquo:NominalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:No ;  oquo:hasOutputCardinalValue "0"^^xsd:double .
+ex:NC2 a oquo:NominalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Yes ; oquo:hasOutputCardinalValue "100"^^xsd:double .
+
+# ---------------------------------------------------------------------------
+# Nominal to ordinal: no -> 1 ; yes -> 5
+# ---------------------------------------------------------------------------
+
+ex:NominalToOrdinal a oquo:NominalToOrdinalScaleConversion ;
+    oquo:hasInputScale ex:NominalForOrdinalScale ;
+    oquo:hasOutputScale ex:FiveScale ;
+    oquo:hasScalePointMapping ex:NO1 , ex:NO2 .
+ex:NO1 a oquo:NominalToOrdinalScalePointMapping ; oquo:hasInputScaleCategory ex:No ;  oquo:hasOutputScaleCategory ex:Five1 .
+ex:NO2 a oquo:NominalToOrdinalScalePointMapping ; oquo:hasInputScaleCategory ex:Yes ; oquo:hasOutputScaleCategory ex:Five5 .
+
+# ---------------------------------------------------------------------------
+# Nominal to nominal: no -> fail ; yes -> pass
+# ---------------------------------------------------------------------------
+
+ex:NominalToNominal a oquo:NominalToNominalScaleConversion ;
+    oquo:hasInputScale ex:NominalForNominalScale ;
+    oquo:hasOutputScale ex:PassFailScale ;
+    oquo:hasScalePointMapping ex:NN1 , ex:NN2 .
+ex:NN1 a oquo:NominalToNominalScalePointMapping ; oquo:hasInputScaleCategory ex:No ;  oquo:hasOutputScaleCategory ex:Fail .
+ex:NN2 a oquo:NominalToNominalScalePointMapping ; oquo:hasInputScaleCategory ex:Yes ; oquo:hasOutputScaleCategory ex:Pass .
