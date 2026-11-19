@@ -1,8 +1,12 @@
 package es.um.dis.tecnomod.oquo.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.Calendar;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.jena.rdf.model.Model;
@@ -82,6 +86,7 @@ public class InstanceCreator {
 	private static final String EVALUATION_CONFIGURATION_DATA = Namespaces.OQUO_NS + "EvaluationConfigurationData";
 	private static final String HAS_OBSERVATION = Namespaces.OQUO_NS + "hasObservation";
 	private static final String HAS_INPUT_SCALE = Namespaces.OQUO_NS + "hasInputScale";
+	private static final String HAS_OUTPUT_SCALE = Namespaces.OQUO_NS + "hasOutputScale";
 
 	/* SCHEMA */
 	private static final String SCHEMA_SOFTWARE_VERSION_IRI = Namespaces.SCHEMA_NS + "softwareVersion";
@@ -94,6 +99,17 @@ public class InstanceCreator {
 
 	/* Time ontology */
 	private static final String HAS_TIME = Namespaces.TIME_NS + "hasTime";
+
+	/** A quality value pending conversion, and the scales already reached from the quality value it comes from. */
+	private static final class PendingConversion {
+		final Resource qualityValue;
+		final Set<Resource> reachedScales;
+
+		PendingConversion(Resource qualityValue, Set<Resource> reachedScales) {
+			this.qualityValue = qualityValue;
+			this.reachedScales = reachedScales;
+		}
+	}
 
 
 
@@ -122,19 +138,64 @@ public class InstanceCreator {
 		return rdfModel;
 	}
 
+	/**
+	 * Adds to rdfModel the OQUO module at ontologyIRI, together with all the ontologies it imports,
+	 * and applies its scale conversions to the quality values of rdfModel.
+	 * <p>
+	 * Each quality value is converted with every scale conversion whose input scale is the scale of
+	 * the value, creating a new quality value on the output scale of the conversion (see
+	 * {@link ScaleConversionJenaUtils#applyScaleConversion}). The new quality values are converted in
+	 * turn, so conversions can be chained (e.g. from the raw scale of a metric to the scale of a
+	 * quality model, and from there to another scale). From each original quality value, at most one
+	 * value is created on each scale, which prevents both duplicated values, when several chains reach
+	 * the same scale, and infinite loops, when the conversions form a cycle.
+	 * <p>
+	 * Quality values that are not measured on any scale, or whose value matches no point mapping of a
+	 * conversion, are not converted.
+	 *
+	 * @param rdfModel model with the observations, to which the ontologies and the new quality values
+	 *                 are added
+	 * @param ontologyIRI IRI, version IRI or location of the OQUO module that describes the
+	 *                    observations (e.g. {@code https://purl.org/oquo-huron})
+	 * @param oquoDataNamespace namespace in which the new quality values are created
+	 */
 	public static void applyModel(Model rdfModel, String ontologyIRI, String oquoDataNamespace) {
 		Model ontology = JenaUtils.readOntologyWithImports(ontologyIRI);
 		rdfModel.add(ontology);
 
-		List<Resource> qualityValues = rdfModel.listResourcesWithProperty(RDF.type, rdfModel.getResource(QUALITY_VALUE)).toList();
-		for (Resource qualityValue : qualityValues) {
-			Resource qualityValueScale = qualityValue.getPropertyResourceValue(rdfModel.getProperty(IS_MEASURED_ON_SCALE));
-			if (qualityValueScale == null) {
-				continue;
+		Property isMeasuredOnScale = rdfModel.getProperty(IS_MEASURED_ON_SCALE);
+		Property hasInputScale = rdfModel.getProperty(HAS_INPUT_SCALE);
+		Property hasOutputScale = rdfModel.getProperty(HAS_OUTPUT_SCALE);
+
+		// The initial quality values, each one with the scales reached from it (so far, its own)
+		Deque<PendingConversion> pending = new ArrayDeque<>();
+		for (Resource qualityValue : rdfModel
+				.listResourcesWithProperty(RDF.type, rdfModel.getResource(QUALITY_VALUE)).toList()) {
+			Resource scale = qualityValue.getPropertyResourceValue(isMeasuredOnScale);
+			if (scale != null) {
+				Set<Resource> reachedScales = new HashSet<>();
+				reachedScales.add(scale);
+				pending.add(new PendingConversion(qualityValue, reachedScales));
 			}
-			List<Resource> applicableScaleConversions = rdfModel.listResourcesWithProperty(rdfModel.getProperty(HAS_INPUT_SCALE), qualityValueScale).toList();
-			for(Resource scaleConversion : applicableScaleConversions) {
-				ScaleConversionJenaUtils.applyScaleConversion(rdfModel, qualityValue, scaleConversion, oquoDataNamespace);
+		}
+
+		// Converts each quality value with the conversions of its scale, and the converted values in turn,
+		// without converting a value twice to the same scale (which also prevents cycles)
+		while (!pending.isEmpty()) {
+			PendingConversion current = pending.poll();
+			Resource scale = current.qualityValue.getPropertyResourceValue(isMeasuredOnScale);
+			List<Resource> scaleConversions = rdfModel.listResourcesWithProperty(hasInputScale, scale).toList();
+			for (Resource scaleConversion : scaleConversions) {
+				Resource outputScale = scaleConversion.getPropertyResourceValue(hasOutputScale);
+				if (outputScale == null || current.reachedScales.contains(outputScale)) {
+					continue;
+				}
+				Resource converted = ScaleConversionJenaUtils.applyScaleConversion(rdfModel, current.qualityValue,
+						scaleConversion, oquoDataNamespace);
+				if (converted != null) {
+					current.reachedScales.add(outputScale);
+					pending.add(new PendingConversion(converted, current.reachedScales));
+				}
 			}
 		}
 	}

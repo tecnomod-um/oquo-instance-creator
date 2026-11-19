@@ -1,0 +1,135 @@
+# Test ontology for chained scale conversions in oquo-instance-creator.
+#
+# - Chain: ChainRawScale -> ChainFiveScale -> ChainPercentageScale -> ChainPassFailScale,
+#   plus a conversion back from ChainPercentageScale to ChainFiveScale, which closes a cycle.
+# - Diamond: DiamondRawScale -> DiamondAScale -> DiamondTargetScale and
+#            DiamondRawScale -> DiamondBScale -> DiamondTargetScale.
+# - Self loop: LoopScale -> LoopScale.
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix om:   <http://www.wurvoc.org/vocabularies/om-1.8/> .
+@prefix qm:   <http://purl.org/net/QualityModel#> .
+@prefix oquo: <https://purl.org/oquo#> .
+@prefix ex:   <https://example.org/oquo-conversions-chain-test#> .
+
+<https://example.org/oquo-conversions-chain-test> a owl:Ontology .
+
+# ---------------------------------------------------------------------------
+# Chain
+# ---------------------------------------------------------------------------
+
+ex:ChainRawScale a om:Ratio_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest .
+
+ex:ChainFiveScale a om:Ordinal_scale ; qm:hasRankigFunction qm:HigherBest ;
+    om:element ex:Five1 , ex:Five2 , ex:Five3 , ex:Five4 , ex:Five5 .
+ex:Five1 a om:Ordered_measurement_scale_category ; om:rank 1 ; rdfs:label "five 1" .
+ex:Five2 a om:Ordered_measurement_scale_category ; om:rank 2 ; rdfs:label "five 2" .
+ex:Five3 a om:Ordered_measurement_scale_category ; om:rank 3 ; rdfs:label "five 3" .
+ex:Five4 a om:Ordered_measurement_scale_category ; om:rank 4 ; rdfs:label "five 4" .
+ex:Five5 a om:Ordered_measurement_scale_category ; om:rank 5 ; rdfs:label "five 5" .
+
+ex:ChainPercentageScale a om:Ratio_scale ; qm:hasRankigFunction qm:HigherBest .
+
+ex:ChainPassFailScale a om:Nominal_scale ; om:element ex:Pass , ex:Fail .
+ex:Pass a om:Measurement_scale_category ; rdfs:label "pass" .
+ex:Fail a om:Measurement_scale_category ; rdfs:label "fail" .
+
+# Raw -> five categories: [0, 0.2) -> 1, [0.2, 0.4) -> 2, [0.4, 0.6) -> 3, [0.6, 0.8) -> 4, [0.8, INF) -> 5
+ex:RawToFive a oquo:CardinalToOrdinalScaleConversion ;
+    oquo:hasInputScale ex:ChainRawScale ;
+    oquo:hasOutputScale ex:ChainFiveScale ;
+    oquo:hasScalePointMapping ex:RF1 , ex:RF2 , ex:RF3 , ex:RF4 , ex:RF5 .
+ex:RF1 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five1 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "0.2"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+ex:RF2 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five2 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0.2"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "0.4"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+ex:RF3 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five3 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0.4"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "0.6"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+ex:RF4 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five4 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0.6"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "0.8"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+ex:RF5 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five5 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0.8"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "INF"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+
+# Five categories -> percentage: 1 -> 0, 2 -> 25, 3 -> 50, 4 -> 75, 5 -> 100
+ex:FiveToPercentage a oquo:OrdinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:ChainFiveScale ;
+    oquo:hasOutputScale ex:ChainPercentageScale ;
+    oquo:hasScalePointMapping ex:FP1 , ex:FP2 , ex:FP3 , ex:FP4 , ex:FP5 .
+ex:FP1 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Five1 ; oquo:hasOutputCardinalValue "0"^^xsd:double .
+ex:FP2 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Five2 ; oquo:hasOutputCardinalValue "25"^^xsd:double .
+ex:FP3 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Five3 ; oquo:hasOutputCardinalValue "50"^^xsd:double .
+ex:FP4 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Five4 ; oquo:hasOutputCardinalValue "75"^^xsd:double .
+ex:FP5 a oquo:OrdinalToCardinalScalePointMapping ; oquo:hasInputScaleCategory ex:Five5 ; oquo:hasOutputCardinalValue "100"^^xsd:double .
+
+# Percentage -> pass/fail: [0, 50) -> fail, [50, INF) -> pass
+ex:PercentageToPassFail a oquo:CardinalToNominalScaleConversion ;
+    oquo:hasInputScale ex:ChainPercentageScale ;
+    oquo:hasOutputScale ex:ChainPassFailScale ;
+    oquo:hasScalePointMapping ex:PPF1 , ex:PPF2 .
+ex:PPF1 a oquo:CardinalToNominalScalePointMapping ; oquo:hasOutputScaleCategory ex:Fail ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "0"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "50"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+ex:PPF2 a oquo:CardinalToNominalScalePointMapping ; oquo:hasOutputScaleCategory ex:Pass ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "50"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:ClosedIntervalBound ;
+        oquo:hasIntervalUpperValue "INF"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+
+# Percentage -> five categories, back to a scale already reached: it closes a cycle
+ex:PercentageToFive a oquo:CardinalToOrdinalScaleConversion ;
+    oquo:hasInputScale ex:ChainPercentageScale ;
+    oquo:hasOutputScale ex:ChainFiveScale ;
+    oquo:hasScalePointMapping ex:PF1 .
+ex:PF1 a oquo:CardinalToOrdinalScalePointMapping ; oquo:hasOutputScaleCategory ex:Five3 ;
+    oquo:hasInputCardinalInterval [ a oquo:Interval ;
+        oquo:hasIntervalLowerValue "-INF"^^xsd:double ; oquo:hasIntervalLowerBoundType oquo:OpenIntervalBound ;
+        oquo:hasIntervalUpperValue "INF"^^xsd:double ; oquo:hasIntervalUpperBoundType oquo:OpenIntervalBound ] .
+
+# ---------------------------------------------------------------------------
+# Diamond: two chains reach DiamondTargetScale
+# ---------------------------------------------------------------------------
+
+ex:DiamondRawScale    a om:Ratio_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest .
+ex:DiamondAScale      a om:Ratio_scale ; qm:hasRankigFunction qm:HigherBest .
+ex:DiamondBScale      a om:Ratio_scale ; qm:hasRankigFunction qm:HigherBest .
+ex:DiamondTargetScale a om:Ratio_scale ; qm:hasRankigFunction qm:HigherBest .
+
+# Raw -> A: 2x ; raw -> B: 3x ; A -> target: x + 1 ; B -> target: x + 1 (no input intervals: any value)
+ex:RawToA a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:DiamondRawScale ; oquo:hasOutputScale ex:DiamondAScale ;
+    oquo:hasScalePointMapping [ a oquo:CardinalToCardinalScalePointMapping ;
+        oquo:hasSlope "2"^^xsd:double ; oquo:hasIntercept "0"^^xsd:double ] .
+ex:RawToB a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:DiamondRawScale ; oquo:hasOutputScale ex:DiamondBScale ;
+    oquo:hasScalePointMapping [ a oquo:CardinalToCardinalScalePointMapping ;
+        oquo:hasSlope "3"^^xsd:double ; oquo:hasIntercept "0"^^xsd:double ] .
+ex:AToTarget a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:DiamondAScale ; oquo:hasOutputScale ex:DiamondTargetScale ;
+    oquo:hasScalePointMapping [ a oquo:CardinalToCardinalScalePointMapping ;
+        oquo:hasSlope "1"^^xsd:double ; oquo:hasIntercept "1"^^xsd:double ] .
+ex:BToTarget a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:DiamondBScale ; oquo:hasOutputScale ex:DiamondTargetScale ;
+    oquo:hasScalePointMapping [ a oquo:CardinalToCardinalScalePointMapping ;
+        oquo:hasSlope "1"^^xsd:double ; oquo:hasIntercept "1"^^xsd:double ] .
+
+# ---------------------------------------------------------------------------
+# Self loop: a conversion from a scale to itself
+# ---------------------------------------------------------------------------
+
+ex:LoopScale a om:Ratio_scale , oquo:RawScale ; qm:hasRankigFunction qm:HigherBest .
+ex:LoopToLoop a oquo:CardinalToCardinalScaleConversion ;
+    oquo:hasInputScale ex:LoopScale ; oquo:hasOutputScale ex:LoopScale ;
+    oquo:hasScalePointMapping [ a oquo:CardinalToCardinalScalePointMapping ;
+        oquo:hasSlope "1"^^xsd:double ; oquo:hasIntercept "1"^^xsd:double ] .

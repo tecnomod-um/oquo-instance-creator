@@ -70,7 +70,7 @@ public class ScaleConversionJenaUtils {
 	 * @param scaleConversion conversion to apply
 	 * @param oquoDataNamespace namespace of the new quality value
 	 */
-	public static void applyScaleConversion(Model rdfModel, Resource qualityValue, Resource scaleConversion,
+	public static Resource applyScaleConversion(Model rdfModel, Resource qualityValue, Resource scaleConversion,
 			String oquoDataNamespace) {
 		Resource outputScale = scaleConversion.getPropertyResourceValue(rdfModel.getProperty(HAS_OUTPUT_SCALE));
 		List<Resource> scalePointMappings = scaleConversion
@@ -96,9 +96,10 @@ public class ScaleConversionJenaUtils {
 			throw new IllegalArgumentException("Unknown type of scale conversion: " + scaleConversion);
 		}
 
-		if (convertedValue != null) {
-			createConvertedQualityValue(rdfModel, qualityValue, outputScale, convertedValue, oquoDataNamespace);
+		if (convertedValue == null) {
+			return null;
 		}
+		return createConvertedQualityValue(rdfModel, qualityValue, outputScale, convertedValue, oquoDataNamespace);
 	}
 
 	/**
