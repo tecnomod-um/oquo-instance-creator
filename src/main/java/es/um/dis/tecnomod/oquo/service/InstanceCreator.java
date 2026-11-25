@@ -163,6 +163,7 @@ public class InstanceCreator {
 		Model ontology = JenaUtils.readOntologyWithImports(ontologyIRI);
 		rdfModel.add(ontology);
 
+		String resolvedOquoDataNamespace = resolveDataNamespace(oquoDataNamespace);
 		Property isMeasuredOnScale = rdfModel.getProperty(IS_MEASURED_ON_SCALE);
 		Property hasInputScale = rdfModel.getProperty(HAS_INPUT_SCALE);
 		Property hasOutputScale = rdfModel.getProperty(HAS_OUTPUT_SCALE);
@@ -191,7 +192,7 @@ public class InstanceCreator {
 					continue;
 				}
 				Resource converted = ScaleConversionJenaUtils.applyScaleConversion(rdfModel, current.qualityValue,
-						scaleConversion, oquoDataNamespace);
+						scaleConversion, resolvedOquoDataNamespace);
 				if (converted != null) {
 					current.reachedScales.add(outputScale);
 					pending.add(new PendingConversion(converted, current.reachedScales));
